@@ -1,0 +1,10 @@
+{
+  "name" : "nodejs-tmpl",
+  "version" : "0.0.1",
+  "dependencies" : {
+    "express" : "*",    
+    "mongodb" : "*",
+    "hbs" : "*",
+    "underscore" : "*"
+  }
+}

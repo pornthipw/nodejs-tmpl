@@ -1,0 +1,36 @@
+<div class="span12">
+  <table class="table span9">
+    <tr> 
+      <td class="span5">Name</td>
+      <td class="span4">File</td>
+      <td>Upload date</td>
+    </tr>
+    <tr ng-repeat="file in file_list | orderBy:'uploadDate':true | startFrom:currentPage*pageSize | limitTo:pageSize" > 
+      <td>{{file.metadata.title}}</td>
+      <td>
+        <span>{{file.filename}}</span>
+        <span class="pull-right">  
+          <div class="dropdown">
+            <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i><b class="caret"></b></a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+                <li><a tabindex="-1" href="grad_file/files/{{file._id}}" target="_blank"><i class=" icon-file"></i> View File</a></li>
+                <li class="divider"></li>
+                <li><a tabindex="-1" href="#/list">Separated link</a></li>
+              </ul>
+          </div>
+        </span>
+                    
+      </td>
+      <td>{{file.uploadDate | date:'MMM d, yyyy HH:mm' }}</td>        
+    </tr>                    
+  </table>
+</div>
+
+<div class="span9" >            
+  <span class="form-inline pull-right">
+    #Item per Page <input type="text" ng-model="pageSize" class="span1">
+    <button class="btn btn-primary" ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1">Previous</button>
+    <input type="text" class="span1" ng-model="currentPage"> / {{numberOfPages()}}
+    <button class="btn btn-primary"  ng-disabled="currentPage >= file_list.length/pageSize - 1" ng-click="currentPage=currentPage+1">Next</button>
+  </span>
+</div>
