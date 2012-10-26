@@ -90,9 +90,7 @@ exports.listFile = function(req, res, next) {
         if(err) {
           res.json({success:false,message:err});              
         }
-        //console.log(docs);
-        res.json(docs); 
-        //res.json({success:true,doc:docs});           
+        res.json(docs);          
     });            
   });                    
 };

@@ -3,25 +3,38 @@ var app = angular.module('gradfile', ['file_service','ace']);
 app.config(function($routeProvider) {
     $routeProvider.
       when('/', {controller:fileCtrl, templateUrl:'static/index.html'}).
-      when('/list', {controller:fileCtrl, templateUrl:'static/filelist.html'});
+      when('/add', {controller:CreateFileController, templateUrl:'static/form.html'}).
+      when('/add/:conetntId', {controller:fileCtrl, templateUrl:'static/form.html'});
      // when('/detail/:fileId', {controller:detailCtrl, templateUrl:'static/detail.html'});
 });
 
-function fileCtrl($scope, FileDB) {    
-    $scope.file_list = FileDB.query(function(result) {
+function fileCtrl($scope, $location,FileDB) {    
+    var self = this;
+    $scope.content_list = FileDB.query(function(result) {
 	  console.log(result);
       });
     
-    $scope.currentPage = 0;
-    $scope.page = 0;
-    $scope.pageSize = 2;    
+  $scope.get = function(conetntId) {
+    FileDB.get({id:contactId}, function(response) {
+      self.original = response;
+      $scope.content = new FileDB(self.original);      
+    }); 
+  };
     
-    $scope.numberOfPages=function() {
-      if($scope.file_list) {        
-	var totalPage = Math.ceil($scope.file_list.length/$scope.pageSize);               
-	return totalPage;          
-      }
-    };         
+    
+    $scope.save = function() {  
+    if($scope.content._id) {      
+      $scope.content.update(function() {
+        $scope.content_list = FileDB.query(); 
+	//$location.path('/');
+      });    
+    } else {
+        FileDB.save($scope.content, function(response) {
+          $scope.content_list = FileDB.query(); 
+        });    
+    }
+  };   
+            
 };
 
 app.filter('startFrom', function() {
@@ -55,3 +68,12 @@ function detailCtrl($scope, $location,  $routeParams, FileDB){
     
 } 
 */
+function CreateFileController($scope, $location, FileDB) {
+  $scope.save = function() {    
+    console.log($scope.content);
+    FileDB.save($scope.content, function(response) {
+      $location.path('/');
+    }); 
+       
+  };  
+}
