@@ -74,14 +74,9 @@ app.get('/', function(req, res){
   res.render('index');
 });
 
-app.get('/:db/files/:id', function (req,res){ 
-    var db = req.db;
-});
-
 app.post('/:db/files', function (req,res){
   
   var db = req.db;
-  
   if(req.body) {          
     //var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.files.file.name, 'w', {content_type:req.files.file.type,metadata: {'title':req.body.title}}); 
     var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.body, 'w');   
@@ -105,33 +100,31 @@ app.post('/:db/files', function (req,res){
     
 });
 
-app.post('/:db/files/:id', function (req,res){
-  
+app.get('/:db/files/:id', function (req,res){
   var db = req.db;
+  fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
+  console.log("req.params.id--->"+req.params.id+"    fileId--->"+fileId);
+  var gridStore = new mongodb.GridStore(db, fileId, 'r');
+    gridStore.open(function(err, gs) {
+	gs.collection(function(err, collection) {
+	    collection.find({_id:fileId}).toArray(function(err,docs) {
+		var doc = docs[0];
+		// example--> {"nook":"2"}
+		console.log(doc.filename);
+		var stream = gs.stream(true);
+		res.setHeader('Content-dispostion', 'attachment;filename='+doc.filename);
+		res.setHeader('Content-type',doc.contentType);
+		stream.on("data", function(chunk) {
+		    res.write(chunk);
+		});
 	
-  var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);
-  GridStore.exist(db, fileId, function(err, exist) {                
-      if(exist) {
-	  var gridStore = new mongodb.GridStore(client, fileId, 'w');
-	  gridStore.open(function(err, gridStore) {
-	      gridStore.contentType = req.query.contentType;
-	      console.log(req.query.content);
-	      gridStore.write(new Buffer(req.query.content, "utf8"), req.query.contentType,function(err, gridStore) {                    
-		  if(!err) {
-		      gridStore.close(function(err, result) {                        
-			  if(!err) {
-			      res.json(result);
-			      client.close();
-			  }
-		      });
-		  }
-	      }); 
-	  });
-      } else {
-	  res.json({'status':'Error', 'message': 'File Does Not Exists'});
-	  client.close();
-      }
-  });
+		stream.on("end", function() {
+		    res.end();
+		});
+	    });
+	});
+    });
+  
 });
 
 

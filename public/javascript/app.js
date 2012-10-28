@@ -4,7 +4,7 @@ app.config(function($routeProvider) {
     $routeProvider.
       when('/', {controller:fileCtrl, templateUrl:'static/index.html'}).
       when('/add', {controller:CreateFileController, templateUrl:'static/form.html'}).
-      when('/add/:conetntId', {controller:fileCtrl, templateUrl:'static/form.html'});
+      when('/add/:contentId', {controller:fileCtrl, templateUrl:'static/form.html'});
      // when('/detail/:fileId', {controller:detailCtrl, templateUrl:'static/detail.html'});
 });
 
@@ -14,8 +14,8 @@ function fileCtrl($scope, $location,FileDB) {
 	  console.log(result);
       });
     
-  $scope.get = function(conetntId) {
-    FileDB.get({id:contactId}, function(response) {
+  $scope.get = function(contentId) {
+    FileDB.get({id:contentId}, function(response) {
       self.original = response;
       $scope.content = new FileDB(self.original);      
     }); 
