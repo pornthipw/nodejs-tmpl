@@ -10,13 +10,11 @@ hhh
       <thead>
         <tr>
           <th>Name <a href="" ng-click="add()" class="pull-right"><i class="icon-plus-sign"></i></a></th>
-         
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="content in content_list |  filter:search ">
-          <td><a href="" ng-click="get(content._id.$oid)">{{content.filename}}</a></td>
-
+          <td><a href="" ng-click="get(content._id.$oid)">{{content._id.$oid}}-{{content._id}} - {{content.filename}}</a></td>
         </tr>
       </tbody>
     </table>
@@ -33,19 +31,12 @@ hhh
           <button ng-click="contact = null" class="btn btn-info btn-small">Cancel</button>
         </div>
       </div>  
-      <div class="control-group">
         <label class="control-label" for="inputName">Name: <i class="icon-user"></i></label>
-        
-        <div class="controls"  >
-	   <div ng-model="content.filename"ace="json">
-	    <!--<input type="text" id="inputName" placeholder="Name" ng-model="content.filename">-->
-	    <textarea name="tutorial[contents]" ></textarea>
+	   <div ng-model="content.filename" ace="json">
+	      <!--<input type="text" id="inputName" placeholder="Name" ng-model="content.filename">-->
+	      <textarea name="tutorial[contents]" ></textarea>
 	    </div>
-	  </div>
-      </div>
-
-
-
+	    
     </form>    
   </div>
   

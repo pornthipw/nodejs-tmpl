@@ -4,15 +4,18 @@ app.config(function($routeProvider) {
     $routeProvider.
       when('/', {controller:fileCtrl, templateUrl:'static/index.html'}).
       when('/add', {controller:CreateFileController, templateUrl:'static/form.html'}).
+      when('/edit/content/:contentId', { controller:fileCtrl, templateUrl:'static/form.html'}).
       when('/add/:contentId', {controller:fileCtrl, templateUrl:'static/form.html'});
-     // when('/detail/:fileId', {controller:detailCtrl, templateUrl:'static/detail.html'});
+      //when('/detail/:contentId', {controller:detailCtrl, templateUrl:'static/detail.html'});
 });
 
-function fileCtrl($scope, $location,FileDB) {    
+function fileCtrl($scope, $location,$routeParams,FileDB) {    
     var self = this;
-    $scope.content_list = FileDB.query(function(result) {
+    /*$scope.content_list = FileDB.query(function(result) {
 	  console.log(result);
       });
+    */
+     $scope.content_list = FileDB.query(); 
     
   $scope.get = function(contentId) {
     FileDB.get({id:contentId}, function(response) {
@@ -20,7 +23,6 @@ function fileCtrl($scope, $location,FileDB) {
       $scope.content = new FileDB(self.original);      
     }); 
   };
-    
     
     $scope.save = function() {  
     if($scope.content._id) {      

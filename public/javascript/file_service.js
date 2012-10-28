@@ -1,8 +1,15 @@
 var app = angular.module('file_service', ['ngResource']);
 
 app.factory('FileDB', function($resource) {
-    var FileDB  = $resource('grad_file/files/:id', {id:'@id', update: { method: 'PUT' }},{});                 
+    var FileDB  = $resource('grad_file/files/:id', {id:'@id', update: { method: 'PUT' }},{}); 
+    
+    FileDB .prototype.update = function(cb) {
+        return FileDB .update({id: this._id.$oid},
+            angular.extend({}, this, {_id:undefined}), cb);
+    };
+                    
     return FileDB;
+    
 });
 
 /*

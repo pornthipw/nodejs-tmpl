@@ -1,3 +1,18 @@
+  <div class="span5">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="content in content_list">
+        <td><a href="#/edit/content/{{content._id.$oid}}">{{content.filename}}</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <form class="form-horizontal"> 
 <button ng-click="save()" value="Save">Save</button>
 <div ace="json" ng-model="content">

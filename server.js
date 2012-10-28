@@ -74,8 +74,8 @@ app.get('/', function(req, res){
   res.render('index');
 });
 
+//savefile
 app.post('/:db/files', function (req,res){
-  
   var db = req.db;
   if(req.body) {          
     //var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.files.file.name, 'w', {content_type:req.files.file.type,metadata: {'title':req.body.title}}); 
@@ -95,11 +95,10 @@ app.post('/:db/files', function (req,res){
       });
     });    
   }
-  
-  //console.log(req.body);
-    
 });
 
+
+//getFile
 app.get('/:db/files/:id', function (req,res){
   var db = req.db;
   fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
@@ -110,23 +109,49 @@ app.get('/:db/files/:id', function (req,res){
 	    collection.find({_id:fileId}).toArray(function(err,docs) {
 		var doc = docs[0];
 		// example--> {"nook":"2"}
+		//console.log(doc.filename);
 		console.log(doc.filename);
-		var stream = gs.stream(true);
+		res.send(JSON.stringify({success:true, response:doc.filename})); 	  
+		//res.json({'content':doc.filename}); 
+		
+		/*var stream = gs.stream(true);
 		res.setHeader('Content-dispostion', 'attachment;filename='+doc.filename);
 		res.setHeader('Content-type',doc.contentType);
+		
+		
 		stream.on("data", function(chunk) {
 		    res.write(chunk);
 		});
 	
 		stream.on("end", function() {
 		    res.end();
-		});
+		});	   
+		*/
 	    });
 	});
     });
-  
 });
 
+//List File
+app.get('/:db/files', function(req, res) {  
+  // req.params [year, element, type, item]  
+  console.log('listFile ');
+  var db = req.db;
+  console.log('listFile ');
+  db.collection('fs.files', function(err, collection) {
+    if(err) {            
+      console.log("Error :"+err);
+      res.json({success:false,message:err});              
+    }
+    
+    collection.find().toArray(function(err, docs) {
+        if(err) {
+          res.json({success:false,message:err});              
+        }
+        res.json(docs);          
+    });            
+  });                    
+});
 
 app.listen(config.site.port || 3000);
 //app.listen(3000);
