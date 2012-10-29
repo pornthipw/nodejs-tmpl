@@ -73,6 +73,31 @@ app.post('/transform', function(req, res) {
 app.get('/', function(req, res){
   res.render('index');
 });
+//updatefile
+app.post('/:db/files/:id', function (req,res) {
+  var db = req.db;
+  
+  var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);
+    GridStore.exist(db, fileId, function(err, exist) {                
+      if(exist) {
+	var gridStore = new GridStore(client, fileId, 'w');
+	  gridStore.open(function(err, gridStore) {
+	  gridStore.contentType = req.query.contentType;
+	  console.log(req.query.content);
+	  gridStore.write(new Buffer(req.query.content, "utf8"), req.query.contentType,function(err, gridStore) {                    
+	    if(!err) {
+	      gridStore.close(function(err, result) {                        
+		if(!err) {
+		  res.json(result);
+		  client.close();
+		}
+	      });
+	    }
+	  }); 
+	});
+      } 
+  });
+});
 
 //savefile
 app.post('/:db/files', function (req,res){
@@ -96,7 +121,6 @@ app.post('/:db/files', function (req,res){
     });    
   }
 });
-
 
 //getFile
 app.get('/:db/files/:id', function (req,res){
