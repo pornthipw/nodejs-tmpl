@@ -14,7 +14,7 @@ hhh
       </thead>
       <tbody>
         <tr ng-repeat="content in content_list |  filter:search ">
-          <td><a href="" ng-click="get(content._id.$oid)">{{content._id.$oid}}-{{content._id}} - {{content.filename}}</a></td>
+          <td><a href="" ng-click="get(content._id)">{{content._id}} - {{content.filename}}</a></td>
         </tr>
       </tbody>
     </table>
@@ -32,13 +32,12 @@ hhh
         </div>
       </div>  
         <label class="control-label" for="inputName">Name: <i class="icon-user"></i></label>
-	   <div ng-model="content.filename" ace="json">
+	   <div ng-model="content" ace="json">
 	      <!--<input type="text" id="inputName" placeholder="Name" ng-model="content.filename">-->
 	      <textarea name="tutorial[contents]" ></textarea>
 	    </div>
 	    
     </form>    
   </div>
-  
 </div>
 

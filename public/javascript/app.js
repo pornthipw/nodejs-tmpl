@@ -18,9 +18,15 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
      $scope.content_list = FileDB.query(); 
     
   $scope.get = function(contentId) {
+    console.log(contentId);
     FileDB.get({id:contentId}, function(response) {
-      self.original = response;
-      $scope.content = new FileDB(self.original);      
+      if(response.success) {
+	console.log(response);
+	console.log(response.content);
+	$scope.content = response.content;
+      }
+      //self.original = response;
+      //$scope.content = new FileDB(self.original);      
     }); 
   };
     
@@ -73,7 +79,7 @@ function detailCtrl($scope, $location,  $routeParams, FileDB){
 function CreateFileController($scope, $location, FileDB) {
   $scope.save = function() {    
     console.log($scope.content);
-    FileDB.save($scope.content, function(response) {
+    FileDB.save({content:$scope.content}, function(response) {
       $location.path('/');
     }); 
        

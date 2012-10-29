@@ -24,7 +24,7 @@ var test_template = 'PGRpdiBjbGFzcz0iZW50cnkiPg0KICA8aDE+e3t0aXRsZX19PC9oMT4NCiA
 //connect database
 
 app.param('db', function(req, res, next) {
-  var db = new mongodb.Db(req.params.db, new mongodb.Server(config.mongodb.server, config.mongodb.port, {'auto_reconnect':true}));
+  var db = new mongodb.Db(req.params.db, new mongodb.Server(config.mongodb.server, config.mongodb.port, {'auto_reconnect':true}), {'safe':true});
   db.open(function(err,db) {
     if(err) {
       res.send(500, err);
@@ -79,9 +79,9 @@ app.post('/:db/files', function (req,res){
   var db = req.db;
   if(req.body) {          
     //var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.files.file.name, 'w', {content_type:req.files.file.type,metadata: {'title':req.body.title}}); 
-    var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.body, 'w');   
+    var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),'New File', 'w');   
     gridStore.open(function(err, gridStore) {
-      gridStore.write(new Buffer(req.body, "utf8"),function(err, response) { 
+      gridStore.write(new Buffer(req.body.content, "utf8"),function(err, response) { 
 	if(err) {          
           res.send(JSON.stringify({success:false,message:err}));              
         }
@@ -105,30 +105,15 @@ app.get('/:db/files/:id', function (req,res){
   console.log("req.params.id--->"+req.params.id+"    fileId--->"+fileId);
   var gridStore = new mongodb.GridStore(db, fileId, 'r');
     gridStore.open(function(err, gs) {
-	gs.collection(function(err, collection) {
-	    collection.find({_id:fileId}).toArray(function(err,docs) {
-		var doc = docs[0];
-		// example--> {"nook":"2"}
-		//console.log(doc.filename);
-		console.log(doc.filename);
-		res.send(JSON.stringify({success:true, response:doc.filename})); 	  
-		//res.json({'content':doc.filename}); 
-		
-		/*var stream = gs.stream(true);
-		res.setHeader('Content-dispostion', 'attachment;filename='+doc.filename);
-		res.setHeader('Content-type',doc.contentType);
-		
-		
-		stream.on("data", function(chunk) {
-		    res.write(chunk);
-		});
-	
-		stream.on("end", function() {
-		    res.end();
-		});	   
-		*/
-	    });
+      gs.seek(0, function() {
+	gs.read(function(err, data) {	    	    
+	  if(!err) {
+	    res.json({success:true,content:data.toString('utf8')});
+	  } else {
+	    res.json({success:false});
+	  }
 	});
+      });
     });
 });
 
