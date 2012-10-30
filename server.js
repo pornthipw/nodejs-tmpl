@@ -145,10 +145,33 @@ app.get('/:db/files/:id', function (req,res){
 });
 
 //delete File 
-app.delete(':db/files/:id',function(req,res){
-  Console.log('deleteFile ');
-  
-  
+app.delete('/:db/files/:id',function(req,res){
+  console.log('deleteFile '+req.params.id);
+  var db = req.db;
+  if (req.params.id.length == 24) {
+    try {
+	fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
+	mongodb.GridStore.exist(db, fileId, function(err, exist) {   
+	    if(exist) {
+		var gridStore = new mongodb.GridStore(db, fileId, 'w');
+		gridStore.open(function(err, gs) {                        
+		    gs.unlink(function(err, result) { 
+			if(!err) {                              
+			    res.json({'response':req.params.id}); 
+			    //client.close();                                        
+			} else {
+			    console.log(err);
+			}
+		    });                        
+		});//gridStore.open()
+	    } else {
+		console.log(id +' does not exists');
+	    }
+	});
+    } catch (err) {
+	console.log(err);
+    }
+  }
 });
 
 //List File

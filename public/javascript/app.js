@@ -41,7 +41,14 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
   };  
   
   $scope.destroy = function() {
-    FileDB.remov({id:self.current_id}, function(response){
+    /*
+    FileDB.remove({id:self.current_id}, function(response){
+      console.log("OK");
+      $scope.content_list = FileDB.query(); 
+    });
+    */
+    console.log("test"+self.current_id);
+    FileDB.remove({id:self.current_id}, function(response){
       console.log("OK");
       $scope.content_list = FileDB.query(); 
     });

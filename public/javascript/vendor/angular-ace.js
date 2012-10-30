@@ -5,7 +5,6 @@ angular.module('ace', []).directive('ace', function() {
     var editor = ace.edit($(element).find('.' + ACE_EDITOR_CLASS)[0]);
     editor.session.setMode("ace/mode/" + mode);
     editor.renderer.setShowPrintMargin(false);
-
     return editor;
   }
 
@@ -39,7 +38,7 @@ angular.module('ace', []).directive('ace', function() {
         //if (valid(editor)) {
           //scope.$apply(read);
 	  
-	  ngModel.$setViewValue(editor.getValue());	
+	ngModel.$setViewValue(editor.getValue());	
         textarea.val(editor.getValue());
         //}
       });

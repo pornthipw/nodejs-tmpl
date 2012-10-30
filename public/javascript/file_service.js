@@ -12,25 +12,47 @@ app.factory('FileDB', function($resource) {
     
 });
 
+app.factory('base64', function() {
+    return {
+
+        name: 'Base64',
+        readonly: false,
+
+        encode: function(input) {
+            return window.btoa(input);
+        },
+
+        decode: function(input) {
+            return window.atob(input);
+        }
+
+    };
+});
+
+
+
+/*
+mainModule.factory('base64', ['$window', function($window) {
+    return {
+
+        name: 'Base64',
+        readonly: false,
+
+        encode: function(input) {
+            return $window.btoa(input);
+        },
+
+        decode: function(input) {
+            return $window.atob(input);
+        }
+
+    };
+}]);
+*/
+
 /*
 app.factory('User', function($resource) {
     var User = $resource('userinfo', {});
     return User;
 });
-*/
-
-/*
-    factory('File', function($resource){
-        var  File  = $resource('/mongo/files/:id', {id:'@_id'}, {
-            query: {method:'GET',isArray:true},
-            save_content: {method:'POST'}
-        });    
-        
-        File.prototype.content = function(cb) {
-            return File.get({id: this._id,content:true}, function(content) {
-                cb(content);
-            });
-        };                     
-        return File;
-
 */
