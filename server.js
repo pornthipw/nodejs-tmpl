@@ -78,18 +78,19 @@ app.post('/:db/files/:id', function (req,res) {
   var db = req.db;
   
   var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);
-    GridStore.exist(db, fileId, function(err, exist) {                
+  console.log(fileId);   
+  mongodb.GridStore.exist(db, fileId, function(err, exist) {                
       if(exist) {
-	var gridStore = new GridStore(client, fileId, 'w');
+	var gridStore = new mongodb.GridStore(db, fileId, 'w');
 	  gridStore.open(function(err, gridStore) {
-	  gridStore.contentType = req.query.contentType;
-	  console.log(req.query.content);
-	  gridStore.write(new Buffer(req.query.content, "utf8"), req.query.contentType,function(err, gridStore) {                    
+	  //gridStore.contentType = req.query.contentType;
+	  console.log(req.body.content);
+	  gridStore.write(new Buffer(req.body.content, "utf8"), function(err, gridStore) {                    
 	    if(!err) {
 	      gridStore.close(function(err, result) {                        
 		if(!err) {
 		  res.json(result);
-		  client.close();
+		  db.close();
 		}
 	      });
 	    }
@@ -99,9 +100,9 @@ app.post('/:db/files/:id', function (req,res) {
   });
 });
 
-//savefile
 app.post('/:db/files', function (req,res){
   var db = req.db;
+  console.log(req.body.content);
   if(req.body) {          
     //var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.files.file.name, 'w', {content_type:req.files.file.type,metadata: {'title':req.body.title}}); 
     var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),'New File', 'w');   
@@ -116,6 +117,7 @@ app.post('/:db/files', function (req,res){
           }
           console.log(JSON.stringify(result));
           res.send(JSON.stringify({success:true, response:result})); 	  
+	  db.close();
 	});
       });
     });    
@@ -126,6 +128,7 @@ app.post('/:db/files', function (req,res){
 app.get('/:db/files/:id', function (req,res){
   var db = req.db;
   fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
+
   console.log("req.params.id--->"+req.params.id+"    fileId--->"+fileId);
   var gridStore = new mongodb.GridStore(db, fileId, 'r');
     gridStore.open(function(err, gs) {
@@ -139,6 +142,13 @@ app.get('/:db/files/:id', function (req,res){
 	});
       });
     });
+});
+
+//delete File 
+app.delete(':db/files/:id',function(req,res){
+  Console.log('deleteFile ');
+  
+  
 });
 
 //List File
@@ -161,6 +171,8 @@ app.get('/:db/files', function(req, res) {
     });            
   });                    
 });
+
+
 
 app.listen(config.site.port || 3000);
 //app.listen(3000);

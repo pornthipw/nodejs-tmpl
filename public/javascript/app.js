@@ -10,39 +10,53 @@ app.config(function($routeProvider) {
 });
 
 function fileCtrl($scope, $location,$routeParams,FileDB) {    
-    var self = this;
+  var self = this;
     /*$scope.content_list = FileDB.query(function(result) {
 	  console.log(result);
       });
     */
-     $scope.content_list = FileDB.query(); 
+  $scope.content_list = FileDB.query(); 
     
   $scope.get = function(contentId) {
     console.log(contentId);
+    self.current_id = contentId;
     FileDB.get({id:contentId}, function(response) {
       if(response.success) {
 	console.log(response);
 	console.log(response.content);
-	$scope.content = response.content;
+	$scope.content = response.content;	
       }
-      //self.original = response;
-      //$scope.content = new FileDB(self.original);      
     }); 
   };
     
-    $scope.save = function() {  
-    if($scope.content._id) {      
-      $scope.content.update(function() {
-        $scope.content_list = FileDB.query(); 
-	//$location.path('/');
+  $scope.save = function() {  
+    if(self.current_id) {  
+      console.log("test update");                    
+      FileDB.save({id:self.current_id, content:$scope.content}, function(response) {
+	
       });    
     } else {
-        FileDB.save($scope.content, function(response) {
-          $scope.content_list = FileDB.query(); 
-        });    
+
     }
-  };   
-            
+  };  
+  
+  $scope.destroy = function() {
+    FileDB.remov({id:self.current_id}, function(response){
+      console.log("OK");
+      $scope.content_list = FileDB.query(); 
+    });
+  }; 
+  
+  /*
+  $scope.del = function(id) {
+    console.log(id);
+    FileDB.remove({id:id}, function(docs) {
+      console.log('remove');
+      $scope.file_list = FileDB.query();    
+    });
+  };
+  */  
+    
 };
 
 app.filter('startFrom', function() {
@@ -53,10 +67,9 @@ app.filter('startFrom', function() {
     } 
     return [];
   }
-});     
+}); 
 
 /*
-
 function detailCtrl($scope, $location,  $routeParams, FileDB){
     var self = this;
     
@@ -73,15 +86,14 @@ function detailCtrl($scope, $location,  $routeParams, FileDB){
             console.log(result);
         });
     };
-    
 } 
 */
+
 function CreateFileController($scope, $location, FileDB) {
   $scope.save = function() {    
     console.log($scope.content);
     FileDB.save({content:$scope.content}, function(response) {
-      $location.path('/');
+     $location.path('/');
     }); 
-       
   };  
 }

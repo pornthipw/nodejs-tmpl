@@ -27,16 +27,15 @@ hhh
     <div class="control-group">                 
         <div class="controls">
           <button ng-click="save()" class="btn btn-primary btn-small" type="submit"> <i class="icon-ok icon-white"></i> Save</button>                    
-          <button ng-click="destroy()" ng-show="contact._id" class="btn btn-danger btn-small"><i class="icon-remove icon-white"></i> Delete</button>
+          <button ng-click="destroy()" ng-show="content" class="btn btn-danger btn-small"><i class="icon-remove icon-white"></i> Delete</button>
           <button ng-click="contact = null" class="btn btn-info btn-small">Cancel</button>
         </div>
       </div>  
         <label class="control-label" for="inputName">Name: <i class="icon-user"></i></label>
-	   <div ng-model="content" ace="json">
-	      <!--<input type="text" id="inputName" placeholder="Name" ng-model="content.filename">-->
-	      <textarea name="tutorial[contents]" ></textarea>
+	   <div ng-model="content" ace="text">
+	      <textarea></textarea>
 	    </div>
-	    
+	  
     </form>    
   </div>
 </div>

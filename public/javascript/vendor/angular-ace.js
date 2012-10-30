@@ -21,11 +21,10 @@ angular.module('ace', []).directive('ace', function() {
 
     link: function(scope, element, attrs, ngModel) {
       var textarea = $(element).find('textarea');
-      textarea.hide();
+      textarea.hide();                  
 
       var mode = attrs.ace;
-      var editor = loadAceEditor(element, mode);
-
+      var editor = loadAceEditor(element, mode);      
       scope.ace = editor;
 
       if (!ngModel) return; // do nothing if no ngModel
@@ -33,20 +32,23 @@ angular.module('ace', []).directive('ace', function() {
       ngModel.$render = function() {
         var value = ngModel.$viewValue || '';
         editor.getSession().setValue(value);
-        textarea.val(value);
+        textarea.val(value);	
       };
 
-      editor.getSession().on('changeAnnotation', function() {
-        if (valid(editor)) {
-          scope.$apply(read);
-        }
+      editor.getSession().on('change', function() {
+        //if (valid(editor)) {
+          //scope.$apply(read);
+	  
+	  ngModel.$setViewValue(editor.getValue());	
+        textarea.val(editor.getValue());
+        //}
       });
 
       editor.getSession().setValue(textarea.val());
       read();
 
-      function read() {
-        ngModel.$setViewValue(editor.getValue());
+      function read() {	  	
+        ngModel.$setViewValue(editor.getValue());	
         textarea.val(editor.getValue());
       }
     }
