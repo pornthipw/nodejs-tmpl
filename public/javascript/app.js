@@ -6,15 +6,10 @@ app.config(function($routeProvider) {
       when('/add', {controller:CreateFileController, templateUrl:'static/form.html'}).
       when('/edit/content/:contentId', { controller:fileCtrl, templateUrl:'static/form.html'}).
       when('/add/:contentId', {controller:fileCtrl, templateUrl:'static/form.html'});
-      //when('/detail/:contentId', {controller:detailCtrl, templateUrl:'static/detail.html'});
 });
 
 function fileCtrl($scope, $location,$routeParams,FileDB) {    
   var self = this;
-    /*$scope.content_list = FileDB.query(function(result) {
-	  console.log(result);
-      });
-    */
   $scope.content_list = FileDB.query(); 
     
   $scope.get = function(contentId) {
@@ -31,7 +26,8 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
     
   $scope.save = function() {  
     if(self.current_id) {  
-      console.log("test update");                    
+      console.log("test update");
+      $scope.content = angular.injector(['file_service']).get('base64');                   
       FileDB.save({id:self.current_id, content:$scope.content}, function(response) {
 	
       });    
@@ -41,12 +37,6 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
   };  
   
   $scope.destroy = function() {
-    /*
-    FileDB.remove({id:self.current_id}, function(response){
-      console.log("OK");
-      $scope.content_list = FileDB.query(); 
-    });
-    */
     console.log("test"+self.current_id);
     FileDB.remove({id:self.current_id}, function(response){
       console.log("OK");
@@ -54,16 +44,12 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
     });
   }; 
   
-  /*
-  $scope.del = function(id) {
-    console.log(id);
-    FileDB.remove({id:id}, function(docs) {
-      console.log('remove');
-      $scope.file_list = FileDB.query();    
-    });
-  };
-  */  
-    
+  $scope.transfer = function(){
+      console.log("tran");
+      $scope.base64 = angular.injector(['file_service']).get('base64');
+
+  };  
+  
 };
 
 app.filter('startFrom', function() {
@@ -76,25 +62,6 @@ app.filter('startFrom', function() {
   }
 }); 
 
-/*
-function detailCtrl($scope, $location,  $routeParams, FileDB){
-    var self = this;
-    
-    File.get({id: $routeParams.fileId}, function(file) {
-         self.original = file;
-         $scope.file = new File(self.original);
-         file.content(function(content) {
-             $scope.content=content.content;
-         });    
-    });
-         
-    $scope.save = function() {        
-        $scope.file.$save_content({content:$scope.content},function(result){
-            console.log(result);
-        });
-    };
-} 
-*/
 
 function CreateFileController($scope, $location, FileDB) {
   $scope.save = function() {    

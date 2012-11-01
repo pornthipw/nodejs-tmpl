@@ -10,11 +10,13 @@ hhh
       <thead>
         <tr>
           <th>Name <a href="" ng-click="add()" class="pull-right"><i class="icon-plus-sign"></i></a></th>
+	  <th></th>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="content in content_list |  filter:search ">
-          <td><a href="" ng-click="get(content._id)">{{content._id}} - {{content.filename}}</a></td>
+          <td><a href="" ng-click="get(content._id)">{{content._id}} - {{content.filename}}</a>  <a href="" ng-click="transfer()">encode base 64</a></td>
+	  <td><p>Encoded: {{base64.encode(content.filename)}}</p></td>
         </tr>
       </tbody>
     </table>

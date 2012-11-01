@@ -31,8 +31,7 @@ app.factory('base64', function() {
 
 
 
-/*
-mainModule.factory('base64', ['$window', function($window) {
+app.factory('base64', ['$window', function($window) {
     return {
 
         name: 'Base64',
@@ -48,7 +47,7 @@ mainModule.factory('base64', ['$window', function($window) {
 
     };
 }]);
-*/
+
 
 /*
 app.factory('User', function($resource) {
