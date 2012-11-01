@@ -30,7 +30,7 @@ app.factory('base64', function() {
 });
 
 
-
+/*
 app.factory('base64', ['$window', function($window) {
     return {
 
@@ -49,7 +49,7 @@ app.factory('base64', ['$window', function($window) {
 }]);
 
 
-/*
+
 app.factory('User', function($resource) {
     var User = $resource('userinfo', {});
     return User;

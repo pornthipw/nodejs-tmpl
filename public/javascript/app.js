@@ -27,7 +27,7 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
   $scope.save = function() {  
     if(self.current_id) {  
       console.log("test update");
-      $scope.content = angular.injector(['file_service']).get('base64');                   
+      //$scope.content = angular.injector(['file_service']).get('base64');                   
       FileDB.save({id:self.current_id, content:$scope.content}, function(response) {
 	
       });    
@@ -47,6 +47,7 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
   $scope.transfer = function(){
       console.log("tran");
       $scope.base64 = angular.injector(['file_service']).get('base64');
+      //console.log($scope.base64);
 
   };  
   
