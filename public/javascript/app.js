@@ -17,9 +17,16 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
     self.current_id = contentId;
     FileDB.get({id:contentId}, function(response) {
       if(response.success) {
+	self.base64 = angular.injector(['file_service']).get('base64');  
 	console.log(response);
 	console.log(response.content);
-	$scope.content = response.content;	
+	console.log("decode-base64-->", self.base64.decode(response.content)); 
+	
+	//$scope.content = response.content;	
+	$scope.content = self.base64.decode(response.content);
+	//console.log("$scope.content-->"+$scope.content);
+	console.log("encode-base64-->", self.base64.encode($scope.content));
+	//console.log("decode-base64", $scope.base64.decode($scope.content));  
       }
     }); 
   };
@@ -27,8 +34,8 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
   $scope.save = function() {  
     if(self.current_id) {  
       console.log("test update");
-      //$scope.content = angular.injector(['file_service']).get('base64');                   
-      FileDB.save({id:self.current_id, content:$scope.content}, function(response) {
+                
+      FileDB.save({id:self.current_id, content:self.base64.encode($scope.content)}, function(response) {
 	
       });    
     } else {
@@ -47,7 +54,7 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
   $scope.transfer = function(){
       console.log("tran");
       $scope.base64 = angular.injector(['file_service']).get('base64');
-      //console.log($scope.base64);
+      //console.log("encode-base64", $scope.base64.encode(self.content));
 
   };  
   
@@ -66,9 +73,11 @@ app.filter('startFrom', function() {
 
 function CreateFileController($scope, $location, FileDB) {
   $scope.save = function() {    
-    console.log($scope.content);
-    FileDB.save({content:$scope.content}, function(response) {
-     $location.path('/');
+    $scope.base64 = angular.injector(['file_service']).get('base64');
+    console.log("encode-base64", $scope.base64.encode($scope.content));
+    console.log("$scope.content"+$scope.content);
+    FileDB.save({content:$scope.base64.encode($scope.content)}, function(response) {
+     //$location.path('/');
     }); 
   };  
 }
