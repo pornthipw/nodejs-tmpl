@@ -17,13 +17,13 @@ app.factory('base64', function() {
 
         name: 'Base64',
         readonly: false,
-
-        encode: function(input) {
-            return window.btoa(input);
+	
+        encode: function(input) {	  	  	  	  
+	  return window.btoa($.utf8.encode(input));
         },
 
-        decode: function(input) {
-            return window.atob(input);
+        decode: function(input) {	  
+            return $.utf8.decode(window.atob(input));	    	    
         }
 
     };
