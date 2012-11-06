@@ -18,15 +18,16 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
     FileDB.get({id:contentId}, function(response) {
       if(response.success) {
 	self.base64 = angular.injector(['file_service']).get('base64');  
-	console.log(response);
-	console.log(response.content);
-	console.log("decode-base64-->", self.base64.decode(response.content)); 
+	//console.log(response);
+	//console.log(response.content);
+	//console.log("decode-base64-->", self.base64.decode(response.content)); 
 	
 	//$scope.content = response.content;	
 	$scope.content = self.base64.decode(response.content);
 	//console.log("$scope.content-->"+$scope.content);
-	console.log("encode-base64-->", self.base64.encode($scope.content));
+	//console.log("encode-base64-->", self.base64.encode($scope.content));
 	//console.log("decode-base64", $scope.base64.decode($scope.content));  
+	
       }
     }); 
   };
@@ -44,9 +45,9 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
   };  
   
   $scope.destroy = function() {
-    console.log("test"+self.current_id);
+    //console.log("test"+self.current_id);
     FileDB.remove({id:self.current_id}, function(response){
-      console.log("OK");
+      //console.log("OK");
       $scope.content_list = FileDB.query(); 
     });
   }; 
@@ -57,6 +58,21 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
       //console.log("encode-base64", $scope.base64.encode(self.content));
 
   };  
+  
+  $scope.gettempl = function(contentId) {
+      console.log("templ");
+      console.log(contentId);
+      self.templateId = contentId;
+      FileDB.get({id:self.templateId}, function(response) { 
+	if(response.success) {
+	  self.base64 = angular.injector(['file_service']).get('base64');  
+	  $scope.template_content = self.base64.decode(response.content);
+	  //console.log("$scope.content-->"+$scope.content);
+	  //$scope.template_content2 = Handlebars.compile(self.base64.decode(response.content));
+	  //template = Handlebars.compile($('#template').html());
+	}	
+      });
+  };
   
 };
 
@@ -77,7 +93,7 @@ function CreateFileController($scope, $location, FileDB) {
     console.log("encode-base64", $scope.base64.encode($scope.content));
     console.log("$scope.content"+$scope.content);
     FileDB.save({content:$scope.base64.encode($scope.content)}, function(response) {
-     //$location.path('/');
+     $location.path('/');
     }); 
   };  
 }

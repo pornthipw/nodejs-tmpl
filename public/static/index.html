@@ -9,19 +9,30 @@
       <thead>
         <tr>
           <th>Name <a href="" ng-click="add()" class="pull-right"><i class="icon-plus-sign"></i></a></th>
-	  <th></th>
+	  <th>Content</th>
+	  <th>Template</th>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="content in content_list |  filter:search ">
-          <td><a href="" ng-click="get(content._id)">{{content._id}} - {{content.filename}}</a>  <a href="" ng-click="transfer()">encode base 64</a></td>
-	  <td><p>Encoded: {{base64.encode(content.filename)}}</p></td>
+          <td>{{content._id}} - {{content.filename}} </td>
+	  <td><a href="" ng-click="get(content._id)">Select Content</a>  </td>
+	  <td><a href="" ng-click="gettempl(content._id)">Select template</a></td>
         </tr>
       </tbody>
     </table>
   </div>
+  <div class="span6">
+    <b>Content_seleced :</b> {{content}} <br>
+    <b>Template_selected :</b> {{template_content}} <br><br>
+    <button ng-click="merge()" class="btn btn-primary btn-small" type="submit"> <i class="icon-ok icon-white"></i>Merge</button>
+    <script id="template" type="text/x-handlebars-template">
+      {{template_content2}}
+    </script>
+  </div>
 </div>
-  
+
+
 <div class="row-fluid">
   <div class="span6">        
     <form  >    
