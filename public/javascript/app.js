@@ -15,14 +15,12 @@ function UserCtrl($scope, User) {
   
 }
 
-
 function fileCtrl($scope, $location,$routeParams, User, FileDB) {    
   var self = this;
   
   $scope.user = User.get(function(response) {
     console.log(response);
   });
-  
   
   //var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
   //  lineNumbers: true                
@@ -35,16 +33,16 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB) {
     self.current_id = contentId;
     FileDB.get({id:contentId}, function(response) {
       if(response.success) {
-	self.base64 = angular.injector(['file_service']).get('base64');  
-	//console.log(response);
-	//console.log(response.content);
-	//console.log("decode-base64-->", self.base64.decode(response.content)); 
+        self.base64 = angular.injector(['file_service']).get('base64');  
+        //console.log(response);
+        //console.log(response.content);
+        //console.log("decode-base64-->", self.base64.decode(response.content)); 
 	
-	$scope.content = self.base64.decode(response.content);
-	$scope.ace_content = $scope.content;
-	//console.log("$scope.content-->"+$scope.content);
-	//console.log("encode-base64-->", self.base64.encode($scope.content));
-	//console.log("decode-base64", $scope.base64.decode($scope.content));  
+        $scope.content = self.base64.decode(response.content);
+        $scope.ace_content = $scope.content;
+        //console.log("$scope.content-->"+$scope.content);
+        //console.log("encode-base64-->", self.base64.encode($scope.content));
+        //console.log("decode-base64", $scope.base64.decode($scope.content));  
 	
       }
     }); 
@@ -78,13 +76,13 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB) {
       console.log(contentId);
       self.templateId = contentId;
       FileDB.get({id:self.templateId}, function(response) { 
-	if(response.success) {
-	  self.base64 = angular.injector(['file_service']).get('base64');  
-	  
-	  $scope.template_content = self.base64.decode(response.content);	  
-	  $scope.ace_content = $scope.template_content;
-	}	
-      });
+      if(response.success) {
+        self.base64 = angular.injector(['file_service']).get('base64');  
+        
+        $scope.template_content = self.base64.decode(response.content);	  
+        $scope.ace_content = $scope.template_content;
+      }	
+    });
   };
   
   $scope.$watch('template_content + content', function(newValue, oldValue) {
@@ -95,9 +93,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB) {
       $scope.result_tmpl = template(JSON.parse($scope.content));
     }
   });
-  
-  
-  
 };
 
 app.filter('startFrom', function() {
