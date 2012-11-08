@@ -1,27 +1,81 @@
 var express = require("express");
 var handlebars = require('hbs');
 var mongodb = require('mongodb');
+var passport = require('passport');
+
+
 
 var config = require('./config');
 var routes = require('./routes');
 var app = express();
 
-app.configure(function() {
-  app.use(express.bodyParser());
+app.configure(function() {  
   app.use(express.static(__dirname + '/public'));    
   app.set('views', __dirname + '/views');
   app.engine('html', handlebars.__express);  
   app.set('view engine', 'html');      
+  app.use(express.cookieParser());  
+  app.use(express.bodyParser());
+  app.use(express.session({ secret: 'keyboard cat' }));
   app.use(express.methodOverride());
+  app.use(passport.initialize());
+  app.use(passport.session());
 });
-
-console.log("starting");
 
 var test_data = 'ew0KICAidGl0bGUiOiAiQWxsIGFib3V0IDxwPiBUYWdzIiwNCiAgImJvZHkiOiAiPHA+VGhpcyBpcyBhIHBvc3QgYWJvdXQgJmx0O3AmZ3Q7IHRhZ3M8L3A+Ig0KfQ==';
 var test_template = 'PGRpdiBjbGFzcz0iZW50cnkiPg0KICA8aDE+e3t0aXRsZX19PC9oMT4NCiAgPGRpdiBjbGFzcz0iYm9keSI+DQogICAge3t7Ym9keX19fQ0KICA8L2Rpdj4NCjwvZGl2Pg==';
 
+var OpenIDStrategy = require('passport-openid').Strategy;
 
-//connect database
+passport.serializeUser(function(user, done) {
+  console.log('18 -'+user);
+  done(null, user.identifier);
+});
+
+passport.deserializeUser(function(identifier, done) {
+  console.log('23 -'+identifier);
+  done(null, { identifier: identifier });
+});
+
+passport.use(new OpenIDStrategy({
+    returnURL: config.site.baseUrl+'auth/openid/return',
+    realm: config.site.baseUrl
+  },
+  function(identifier, profile, done) {
+    process.nextTick(function () {
+      
+      // To keep the example simple, the user's OpenID identifier is returned to
+      // represent the logged-in user.  In a typical application, you would want
+      // to associate the OpenID identifier with a user record in your database,
+      // and return that user instead.
+      return done(null, { identifier: identifier })
+    });
+  }
+));
+
+
+
+app.get('/auth/openid', 
+  passport.authenticate('openid', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+  
+app.get('/auth/openid/return', 
+  passport.authenticate('openid', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+});
+
+app.get('/user', function(req, res) {
+  if(req.user) {
+    res.json({'user':req.user});
+  } else {
+    res.json({'user':null});
+  }
+});
+
+
 
 app.param('db', function(req, res, next) {
   var db = new mongodb.Db(req.params.db, new mongodb.Server(config.mongodb.server, config.mongodb.port, {'auto_reconnect':true}), {'safe':true});

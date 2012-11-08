@@ -5,6 +5,8 @@
     "express" : "*",    
     "mongodb" : "*",
     "hbs" : "*",
-    "underscore" : "*"
+    "underscore" : "*",
+     "passport": ">= 0.0.0",
+    "passport-openid":">= 0.0.0"
   }
 }

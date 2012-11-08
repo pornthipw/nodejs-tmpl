@@ -1,4 +1,4 @@
-var app = angular.module('gradfile', ['file_service','ace']);
+var app = angular.module('gradfile', ['file_service','ace','codemirror']);
 
 app.config(function($routeProvider) {
     $routeProvider.
@@ -8,8 +8,26 @@ app.config(function($routeProvider) {
       when('/add/:contentId', {controller:fileCtrl, templateUrl:'static/form.html'});
 });
 
-function fileCtrl($scope, $location,$routeParams,FileDB) {    
+function UserCtrl($scope, User) {
+  $scope.user = User.get(function(response) {
+    console.log(response);
+  });
+  
+}
+
+
+function fileCtrl($scope, $location,$routeParams, User, FileDB) {    
   var self = this;
+  
+  $scope.user = User.get(function(response) {
+    console.log(response);
+  });
+  
+  
+  //var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+  //  lineNumbers: true                
+  //});
+  
   $scope.content_list = FileDB.query(); 
     
   $scope.get = function(contentId) {
@@ -22,8 +40,8 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
 	//console.log(response.content);
 	//console.log("decode-base64-->", self.base64.decode(response.content)); 
 	
-	//$scope.content = response.content;	
 	$scope.content = self.base64.decode(response.content);
+	$scope.ace_content = $scope.content;
 	//console.log("$scope.content-->"+$scope.content);
 	//console.log("encode-base64-->", self.base64.encode($scope.content));
 	//console.log("decode-base64", $scope.base64.decode($scope.content));  
@@ -33,14 +51,10 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
   };
     
   $scope.save = function() {  
-    if(self.current_id) {  
-      console.log("test update");
-                
-      FileDB.save({id:self.current_id, content:self.base64.encode($scope.content)}, function(response) {
-	
+    if(self.current_id) {                        
+      FileDB.save({id:self.current_id, content:self.base64.encode($scope.ace_content)}, function(response) {	
       });    
     } else {
-
     }
   };  
   
@@ -66,13 +80,23 @@ function fileCtrl($scope, $location,$routeParams,FileDB) {
       FileDB.get({id:self.templateId}, function(response) { 
 	if(response.success) {
 	  self.base64 = angular.injector(['file_service']).get('base64');  
-	  $scope.template_content = self.base64.decode(response.content);
-	  //console.log("$scope.content-->"+$scope.content);
-	  //$scope.template_content2 = Handlebars.compile(self.base64.decode(response.content));
-	  //template = Handlebars.compile($('#template').html());
+	  
+	  $scope.template_content = self.base64.decode(response.content);	  
+	  $scope.ace_content = $scope.template_content;
 	}	
       });
   };
+  
+  $scope.$watch('template_content + content', function(newValue, oldValue) {
+    if($scope.content && $scope.template_content) {
+      var template = Handlebars.compile($scope.template_content);
+      console.log(JSON.parse($scope.content));
+      console.log(template(JSON.parse($scope.content)));      
+      $scope.result_tmpl = template(JSON.parse($scope.content));
+    }
+  });
+  
+  
   
 };
 
