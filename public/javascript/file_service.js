@@ -9,6 +9,12 @@ app.factory('FileDB', function($resource) {
     return FileDB;   
 });
 
+app.factory('MetaDB', function($resource) {
+    var MetaDB  = $resource('grad_file/metadata/:id', {id:'@id'},{});                      
+    return MetaDB;   
+});
+
+
 app.factory('User', function($resource) {
     var User  = $resource('user', {}, {});         
     return User;   

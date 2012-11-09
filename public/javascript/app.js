@@ -15,9 +15,16 @@ function UserCtrl($scope, User) {
   
 }
 
-function fileCtrl($scope, $location,$routeParams, User, FileDB) {    
+function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB) {    
   var self = this;
-  self.base64 = angular.injector(['file_service']).get('base64');  
+  self.base64 = angular.injector(['file_service']).get('base64'); 
+  
+$scope.items = [{
+        id: 'content',
+        name: 'content'},
+    {
+        id: 'template',
+        name: 'template'}];
   
   $scope.user = User.get(function(response) {
     console.log(response);
@@ -87,10 +94,24 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB) {
       }
     }); 
   };
+  
+  $scope.editMeta = function(){
+    
+    if(self.current_id) {        
+      console.log("test"+$scope.document.filename);       
+      MetaDB.save({id:self.current_id, doc_name:$scope.document.filename,meta_type:$scope.document.metadata.type}, function(response) {	
+        if(response.success) {
+          $scope.content_list = MetaDB.query();
+        }
+      });    
+    } else {
+    }
+  };
     
   $scope.save = function() {  
     if(self.current_id) {                        
       FileDB.save({id:self.current_id, content:self.base64.encode($scope.ace_content)}, function(response) {	
+        $scope.content_list = FileDB.query();
       });    
     } else {
     }

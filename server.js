@@ -127,6 +127,7 @@ app.post('/transform', function(req, res) {
 app.get('/', function(req, res){
   res.render('index');
 });
+
 //updatefile
 app.post('/:db/files/:id', function (req,res) {
   var db = req.db;
@@ -153,6 +154,39 @@ app.post('/:db/files/:id', function (req,res) {
       } 
   });
 });
+
+//update Metadata
+app.post('/:db/metadata/:id', function (req,res) {
+  console.log("update Metadata");
+  var db = req.db;
+  
+  var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);
+  //console.log(fileId); 
+  //console.log(req.body.doc_name);
+  
+  //console.log('listFile ');
+  db.collection('fs.files', function(err, collection) {
+    if(err) {            
+      console.log("Error :"+err);
+      res.json({success:false,message:err});              
+    }
+    
+    collection.findOne({_id:fileId},function(err, docs) {
+        if(err) {
+          res.json({success:false,message:err});              
+        }
+        docs['filename'] = req.body.doc_name;
+        docs['meta']['type'] = req.body.meta_type;
+        console.log(docs);
+        collection.save(docs, {safe:true}, function(err, result) {
+          res.json(docs); 
+        });
+    });;            
+  });   
+  
+  });
+
+
 
 app.post('/:db/files', function (req,res){
   var db = req.db;
