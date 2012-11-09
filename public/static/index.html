@@ -15,7 +15,13 @@
       </thead>
       <tbody>
         <tr ng-repeat="content in content_list |  filter:search ">
-          <td>{{content._id}} - {{content.filename}} </td>
+          <td>
+	    <span ng-click="get(content._id)">
+	      <span class="badge badge-success" ng-show="content.metadata.type == 'template'">T</span>	      
+	      <span class="badge badge-info" ng-show="content.metadata.type == 'content'">C</span>	      
+	      {{content._id}} - {{content.filename}} 
+	    </span>
+	  </td>
           <td>
             <span class="pull-right">  
               <div class="dropdown">
@@ -24,7 +30,7 @@
                     <li><a tabindex="-1" href="#/" ng-click="get(content._id)"><i class="  icon-hand-up"></i> Select Content</a></li>
                     <li><a tabindex="-1" href="#/" ng-click="gettempl(content._id)"><i class=" icon-hand-up"></i> Select Template</a></li>
                     <li class="divider"></li>
-                    <li><a tabindex="-1" href="#/" ng-click="view_info(content._id)"><i class=" icon-file"></i> View</a></li>
+                    <li><a tabindex="-1" href="#/"  data-toggle="modal" data-target="#contentviewModal"><i class=" icon-file"></i> View</a></li> 
                     <li><a tabindex="-1" href="#/" ng-click="edit_info(content._id)"><i class=" icon-edit"></i> Edit</a></li>
                     <li><a tabindex="-1" href="#/" ng-click="destroy()" ><i class="icon-remove" ></i> Delete</a></li>
                   </ul>
@@ -36,6 +42,7 @@
     </table>
   </div><!--class="span6"-->
   
+  
   <div class="span6 well">
     <span class="label label-success">Content :</span> {{content}}
   </div>
@@ -46,7 +53,9 @@
 </div><!--class="row-fluid">-->
 
 <div class="row-fluid">
-  <div class="span6"> </div>
+  <div class="span6"> 
+    <input type="text" ng-model="document.filename">    
+  </div>
   <div class="span6 well">
     <span class="label label-warning">Result :</span> {{result_tmpl}}
   </div>
@@ -73,4 +82,25 @@
     </form>    
   </div><!--class="span6"-->
 </div><!--class="row-fluid"---->
+
+<!----popup for view content--->
+  <div class="modal hide fade" id="contentviewModal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>View Content</h3>
+    </div>
+    
+    <div class="modal-body">                         	                
+      <div class="span12">
+        <span class="span5">
+          <input class="span12" type="text" placeholder="File Name" ng-model="filename" name="filename">
+        </span>             
+      </div><!---div class="span12"--->
+    </div><!--class="modal-body"--->
+   
+    <div class="modal-footer">                    
+      <a href="#" class="btn">Close</a>
+      <a href="#" class="btn btn-primary">Save changes</a>                              
+    </div><!--div class="modal-footer"---->
+  </div><!--class="modal hide fade"-->
 

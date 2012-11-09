@@ -178,23 +178,42 @@ app.post('/:db/files', function (req,res){
   }
 });
 
+
+
 //getFile
 app.get('/:db/files/:id', function (req,res){
   var db = req.db;
   fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
-
-  console.log("req.params.id--->"+req.params.id+"    fileId--->"+fileId);
+  var fields = null;
+  if(req.query.fields) {
+    fields = JSON.parse(req.query.fields);  
+  }
+  
   var gridStore = new mongodb.GridStore(db, fileId, 'r');
     gridStore.open(function(err, gs) {
+      var context = {};
+                        
       gs.seek(0, function() {
 	gs.read(function(err, data) {	    	    
 	  if(!err) {
-	    res.json({success:true,content:data.toString('utf8')});
+	    context ={success:true,content:data.toString('utf8')}; 	    
+	    if (fields && fields.indexOf("document") != -1) {
+	      gs.collection(function(err, collection) {		
+		collection.findOne({_id:fileId}, function(err, doc) {
+		  context['document'] = doc;
+		  res.json(context);
+		});
+	      });      		      
+	    } else {
+	      res.json(context);
+	    }	          
 	  } else {
 	    res.json({success:false});
-	  }
+	  }	  
 	});
       });
+      
+      
     });
 });
 

@@ -17,6 +17,7 @@ function UserCtrl($scope, User) {
 
 function fileCtrl($scope, $location,$routeParams, User, FileDB) {    
   var self = this;
+  self.base64 = angular.injector(['file_service']).get('base64');  
   
   $scope.user = User.get(function(response) {
     console.log(response);
@@ -31,15 +32,54 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB) {
   $scope.get = function(contentId) {
     console.log(contentId);
     self.current_id = contentId;
-    FileDB.get({id:contentId}, function(response) {
+    FileDB.get({id:contentId, fields:JSON.stringify(["document"])}, function(response) {
+      if(response.success) {
+	$scope.document = response.document;
+	var meta = response.document.metadata;	
+	console.log(response.document);
+	if(meta) {
+	  if(meta.type == "template") {
+	    $scope.template_content = self.base64.decode(response.content);
+	    $scope.ace_content = $scope.template_content;
+	  } else {	    
+	    if(meta.type == "content") {
+	      $scope.content = self.base64.decode(response.content);
+	      $scope.ace_content = $scope.content;
+	    } 	      	    
+	  }
+	} else {
+	  $scope.ace_content = self.base64.decode(response.content);
+	} 
+	
+        
+        //console.log(response);
+        //console.log(response.content);
+        //console.log("decode-base64-->", self.base64.decode(response.content)); 
+	
+        
+        
+        //console.log("$scope.content-->"+$scope.content);
+        //console.log("encode-base64-->", self.base64.encode($scope.content));
+        //console.log("decode-base64", $scope.base64.decode($scope.content));  
+	
+      }
+    }); 
+  };
+  
+  
+  $scope.view_info = function(contentId){
+    console.log(contentId);
+      FileDB.get({id:contentId}, function(response) {
       if(response.success) {
         self.base64 = angular.injector(['file_service']).get('base64');  
         //console.log(response);
         //console.log(response.content);
         //console.log("decode-base64-->", self.base64.decode(response.content)); 
 	
-        $scope.content = self.base64.decode(response.content);
-        $scope.ace_content = $scope.content;
+        $scope.contentInfo = self.base64.decode(response.content);
+	$('#contentviewModal').modal('hide');
+	
+        //$scope.ace_content = $scope.content;
         //console.log("$scope.content-->"+$scope.content);
         //console.log("encode-base64-->", self.base64.encode($scope.content));
         //console.log("decode-base64", $scope.base64.decode($scope.content));  
