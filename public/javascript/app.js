@@ -41,69 +41,38 @@ $scope.items = [{
     self.current_id = contentId;
     FileDB.get({id:contentId, fields:JSON.stringify(["document"])}, function(response) {
       if(response.success) {
-	$scope.document = response.document;
-	var meta = response.document.metadata;	
-	console.log(response.document);
-	if(meta) {
-	  if(meta.type == "template") {
-	    $scope.template_content = self.base64.decode(response.content);
-	    $scope.ace_content = $scope.template_content;
-	  } else {	    
-	    if(meta.type == "content") {
-	      $scope.content = self.base64.decode(response.content);
-	      $scope.ace_content = $scope.content;
-	    } 	      	    
-	  }
-	} else {
-	  $scope.ace_content = self.base64.decode(response.content);
-	} 
-	
-        
-        //console.log(response);
-        //console.log(response.content);
-        //console.log("decode-base64-->", self.base64.decode(response.content)); 
-	
-        
-        
-        //console.log("$scope.content-->"+$scope.content);
-        //console.log("encode-base64-->", self.base64.encode($scope.content));
-        //console.log("decode-base64", $scope.base64.decode($scope.content));  
-	
-      }
-    }); 
-  };
-  
-  
-  $scope.view_info = function(contentId){
-    console.log(contentId);
-      FileDB.get({id:contentId}, function(response) {
-      if(response.success) {
-        self.base64 = angular.injector(['file_service']).get('base64');  
-        //console.log(response);
-        //console.log(response.content);
-        //console.log("decode-base64-->", self.base64.decode(response.content)); 
-	
-        $scope.contentInfo = self.base64.decode(response.content);
-	$('#contentviewModal').modal('hide');
-	
-        //$scope.ace_content = $scope.content;
-        //console.log("$scope.content-->"+$scope.content);
-        //console.log("encode-base64-->", self.base64.encode($scope.content));
-        //console.log("decode-base64", $scope.base64.decode($scope.content));  
+        $scope.document = response.document;
+        var meta = response.document.metadata;	
+        //console.log(response.document);
+        if(meta) {
+          if(meta.type == "template") {
+            $scope.template_content = self.base64.decode(response.content);
+            $scope.ace_content = $scope.template_content;
+          } else {	    
+            if(meta.type == "content") {
+              $scope.content = self.base64.decode(response.content);
+              $scope.ace_content = $scope.content;
+            } 	      	    
+          }
+        } else {
+          $scope.ace_content = self.base64.decode(response.content);
+        }
 	
       }
     }); 
   };
   
   $scope.editMeta = function(){
-    
     if(self.current_id) {        
-      console.log("test"+$scope.document.filename);       
+      console.log($scope.document.metadata.type);  
+      console.log($scope.document.filename); 
+           
       MetaDB.save({id:self.current_id, doc_name:$scope.document.filename,meta_type:$scope.document.metadata.type}, function(response) {	
         if(response.success) {
           $scope.content_list = MetaDB.query();
         }
-      });    
+      }); 
+        
     } else {
     }
   };
@@ -125,12 +94,6 @@ $scope.items = [{
     });
   }; 
   
-  $scope.transfer = function(){
-      console.log("tran");
-      $scope.base64 = angular.injector(['file_service']).get('base64');
-      //console.log("encode-base64", $scope.base64.encode(self.content));
-
-  };  
   
   $scope.gettempl = function(contentId) {
       console.log("templ");

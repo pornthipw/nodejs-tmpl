@@ -176,7 +176,7 @@ app.post('/:db/metadata/:id', function (req,res) {
           res.json({success:false,message:err});              
         }
         docs['filename'] = req.body.doc_name;
-        docs['meta']['type'] = req.body.meta_type;
+        docs['metadata']['type'] = req.body.meta_type;
         console.log(docs);
         collection.save(docs, {safe:true}, function(err, result) {
           res.json(docs); 
