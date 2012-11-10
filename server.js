@@ -3,8 +3,6 @@ var handlebars = require('hbs');
 var mongodb = require('mongodb');
 var passport = require('passport');
 
-
-
 var config = require('./config');
 var routes = require('./routes');
 var app = express();
@@ -28,12 +26,10 @@ var test_template = 'PGRpdiBjbGFzcz0iZW50cnkiPg0KICA8aDE+e3t0aXRsZX19PC9oMT4NCiA
 var OpenIDStrategy = require('passport-openid').Strategy;
 
 passport.serializeUser(function(user, done) {
-  console.log('18 -'+user);
   done(null, user.identifier);
 });
 
 passport.deserializeUser(function(identifier, done) {
-  console.log('23 -'+identifier);
   done(null, { identifier: identifier });
 });
 
@@ -125,7 +121,7 @@ app.post('/transform', function(req, res) {
 });
 
 app.get('/', function(req, res){
-  res.render('index');
+  res.render('index', {baseHref:config.site.baseUrl});
 });
 
 //update File

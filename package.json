@@ -1,12 +1,16 @@
 {
   "name" : "nodejs-tmpl",
+  "user" : "pornthipw",
   "version" : "0.0.1",
   "dependencies" : {
     "express" : "*",    
     "mongodb" : "*",
     "hbs" : "*",
     "underscore" : "*",
-     "passport": ">= 0.0.0",
+    "passport": ">= 0.0.0",
     "passport-openid":">= 0.0.0"
+  },
+  "scripts" :{
+    "start" : "server.js"
   }
 }

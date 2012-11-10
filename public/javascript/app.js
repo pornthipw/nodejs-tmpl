@@ -37,7 +37,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB) {
   $scope.content_list = FileDB.query(); 
     
   $scope.get = function(contentId) {
-    console.log(contentId);
     self.current_id = contentId;
     FileDB.get({id:contentId, fields:JSON.stringify(["document"])}, function(response) {
       if(response.success) {
@@ -97,11 +96,15 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB) {
   
   $scope.create = function () {
     self.current_ace = null;
-      /*if(self.current_id) {     
-        
-      }
-      */
-  };
+    FileDB.save({
+      content:self.base64.encode("--New File--"),
+      filename:"New Document"}, function(response) {
+        if(response.success) {
+          $scope.content_list = FileDB.query(); 
+          $scope.get(response.response._id)
+        }
+    }); 
+  };  
   
   $scope.destroy = function(contentId) {
     FileDB.remove({id:contentId}, function(response){
