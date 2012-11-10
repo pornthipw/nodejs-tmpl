@@ -128,7 +128,7 @@ app.get('/', function(req, res){
   res.render('index');
 });
 
-//updatefile
+//update File
 app.post('/:db/files/:id', function (req,res) {
   var db = req.db;
   
@@ -161,10 +161,6 @@ app.post('/:db/metadata/:id', function (req,res) {
   var db = req.db;
   
   var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);
-  //console.log(fileId); 
-  //console.log(req.body.doc_name);
-  
-  //console.log('listFile ');
   db.collection('fs.files', function(err, collection) {
     if(err) {            
       console.log("Error :"+err);
@@ -187,7 +183,7 @@ app.post('/:db/metadata/:id', function (req,res) {
   });
 
 
-
+//create File
 app.post('/:db/files', function (req,res){
   var db = req.db;
   console.log(req.body.content);
@@ -217,7 +213,7 @@ app.post('/:db/files', function (req,res){
 
 
 
-//getFile
+//get File
 app.get('/:db/files/:id', function (req,res){
   var db = req.db;
   fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
@@ -288,6 +284,10 @@ app.delete('/:db/files/:id',function(req,res){
 app.get('/:db/files', function(req, res) {  
   // req.params [year, element, type, item]  
   console.log('listFile ');
+  if(req.user) {
+    console.log('288');
+    console.log(req.user.identifier);
+  }
   var db = req.db;
   console.log('listFile ');
   db.collection('fs.files', function(err, collection) {
@@ -296,7 +296,8 @@ app.get('/:db/files', function(req, res) {
       res.json({success:false,message:err});              
     }
     
-    collection.find().toArray(function(err, docs) {
+    //collection.find().toArray(function(err, docs) {
+    collection.find({"metadata.user.identifier":req.user.identifier}).toArray(function(err, docs) {
         if(err) {
           res.json({success:false,message:err});              
         }
