@@ -4,9 +4,17 @@
     <button ng-click="save()" class="btn btn-primary btn-small" type="submit"> <i class="icon-ok icon-white"></i> Save</button>                    
     <button ng-click="contact = null" class="btn btn-info btn-small">Cancel</button>
   </div>
+
+<label class="control-label" for="inputfileName">fileName: <i class=" icon-chevron-right"></i> </label> 
+<input type="text" ng-model="filename" > 
+<select  ng-model="meta_type" ng-options="i.id as i.name for i in items">
+  <option value=""></option>
+</select>
+
 </div><!--class="control-group"-->  
 <!--<div ng-model="content" ace="text">-->
-<div ng-model="ace_content" codemirror="text">
+<div ng-model="content" codemirror="text">
   <textarea></textarea>
 </div>
+
 

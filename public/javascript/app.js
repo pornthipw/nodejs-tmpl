@@ -103,21 +103,13 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB) {
       */
   };
   
-  $scope.del = function() {
-    FileDB.remove({id:self.current_id}, function(response){
+  $scope.destroy = function(contentId) {
+    FileDB.remove({id:contentId}, function(response){
       $scope.content_list = FileDB.query(); 
     });
   }; 
   
-  $scope.destroy = function() {
-    
-      $scope.content = null;
-      $scope.ace_content = null;
-      $scope.template_content = null;
-      //console.log(response);
-      //$location.path('/');
-
-  };
+  
   
   $scope.$watch('template_content + content', function(newValue, oldValue) {
     if($scope.content && $scope.template_content) {
@@ -141,11 +133,21 @@ app.filter('startFrom', function() {
 
 
 function CreateFileController($scope, $location, FileDB) {
+  
+    $scope.items = [{
+        id: 'content',
+        name: 'content'},
+    {
+        id: 'template',
+        name: 'template'}];
+        
   $scope.save = function() {    
     $scope.base64 = angular.injector(['file_service']).get('base64');
     console.log("encode-base64", $scope.base64.encode($scope.content));
     console.log("$scope.content"+$scope.content);
-    FileDB.save({content:$scope.base64.encode($scope.content)}, function(response) {
+    //FileDB.save({content:$scope.base64.encode($scope.content),filename:$scope.base64.encode($scope.filename),meta_type:$scope.base64.encode($scope.meta_type)}, function(response) {
+    FileDB.save({content:$scope.base64.encode($scope.content),filename:$scope.filename,meta_type:$scope.meta_type}, function(response) {
+    //FileDB.save({content:$scope.base64.encode($scope.content)}, function(response) {
      $location.path('/');
     }); 
   };  

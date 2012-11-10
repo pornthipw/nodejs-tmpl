@@ -28,7 +28,7 @@ app.factory('base64', function() {
         readonly: false,
 	
         encode: function(input) {	  	  	  	  
-	  return window.btoa($.utf8.encode(input));
+          return window.btoa($.utf8.encode(input));
         },
 
         decode: function(input) {	  
