@@ -19,8 +19,8 @@
         <table class="table table-striped">
           <thead>
             <tr>
-              <th>Name </th>
-              <th>Content / Template</th>
+              <th>Content / Template </th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -29,7 +29,7 @@
                 <span ng-click="get(content._id)">
                   <span class="badge badge-success" ng-show="content.metadata.type == 'template'">T</span>	      
                   <span class="badge badge-info" ng-show="content.metadata.type == 'content'">C</span>	      
-                  {{content._id}} - {{content.filename}} 
+                  <!--{{content._id}} ---> {{content.filename}} 
                 </span>
               </td>
               <td>
@@ -39,8 +39,7 @@
                       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
                         <li><a tabindex="-1" href="#/" ng-click="get(content._id)"><i class="  icon-hand-up"></i> Select</a></li>
                         <li class="divider"></li>
-                        <!--<li><a tabindex="-1" href="#/"  data-toggle="modal" data-target="#contentviewModal"><i class=" icon-file"></i> View</a></li> -->
-                        <li><a tabindex="-1" href="#/" ng-click="destroy()" ><i class="icon-remove" ></i> Delete</a></li>
+                        <li><a tabindex="-1" href="#/" ng-click="del()" ><i class="icon-remove" ></i> Delete</a></li>
                       </ul>
                   </div><!--class="dropdown"-->
                 </span><!--class="pull-right"-->
@@ -70,12 +69,13 @@
   <!--------------------------------------------------------------------------> 
   </div><!--class="span5"-->
   
+  
   <!---RIGHT COLUMN--->
   <div class="span7">
   <!-------------------------------------------------------------------------->
     <div class="row-fluid">
       <div class="span12 well">
-        <span class="label label-success">Content :</span> {{content}}
+        <span class="label label-info">Content :</span> {{content}}
       </div>
     </div><!--class="row-fluid"> Content-->
     <div class="row-fluid">
@@ -102,17 +102,17 @@
       <div class="control-group">                 
         <div class="controls">
           <button ng-click="save()" class="btn btn-primary btn-small" type="submit"> <i class="icon-ok icon-white"></i> Save</button>                    
-          <button ng-click="contact = null" class="btn btn-info btn-small">Cancel</button>
+          <button ng-click="content = null" class="btn btn-info btn-small">Cancel</button>
+          <!--<button ng-click="destroy()" ng-show="content._id" class="btn btn-danger btn-small"><i class="icon-remove icon-white"></i> Delete</button>-->
+          <button ng-click="create()" class="btn btn-success  btn-small" type="submit"> <i class="icon-plus icon-white"></i>New</button>   
         </div>
       </div><!--class="control-group"-->  
-      
-      
 	<!--
 	   <div ng-model="ace_content" ace="text">
 	      <textarea></textarea>
 	    </div>
 	-->
-      <div ng-model="ace_content" codemirror="text">
+      <div ng-model="ace_content" codemirror="text" ">
         <textarea></textarea>
       </div>	  
     </form>    

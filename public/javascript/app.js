@@ -19,7 +19,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB) {
   var self = this;
   self.base64 = angular.injector(['file_service']).get('base64'); 
   
-$scope.items = [{
+  $scope.items = [{
         id: 'content',
         name: 'content'},
     {
@@ -48,14 +48,17 @@ $scope.items = [{
           if(meta.type == "template") {
             $scope.template_content = self.base64.decode(response.content);
             $scope.ace_content = $scope.template_content;
+            //self.current_ace = $scope.ace_content;
           } else {	    
             if(meta.type == "content") {
               $scope.content = self.base64.decode(response.content);
               $scope.ace_content = $scope.content;
+              //self.current_ace = $scope.ace_content;
             } 	      	    
           }
         } else {
           $scope.ace_content = self.base64.decode(response.content);
+          //self.current_ace = $scope.ace_content;
         }
 	
       }
@@ -83,30 +86,37 @@ $scope.items = [{
         $scope.content_list = FileDB.query();
       });    
     } else {
+      /*
+      $scope.base64 = angular.injector(['file_service']).get('base64');
+      FileDB.save({content:$scope.base64.encode($scope.content)}, function(response) {
+           $scope.content_list = FileDB.query();
+      });  
+      */ 
     }
   };  
   
-  $scope.destroy = function() {
-    //console.log("test"+self.current_id);
+  $scope.create = function () {
+    self.current_ace = null;
+      /*if(self.current_id) {     
+        
+      }
+      */
+  };
+  
+  $scope.del = function() {
     FileDB.remove({id:self.current_id}, function(response){
-      //console.log("OK");
       $scope.content_list = FileDB.query(); 
     });
   }; 
   
-  
-  $scope.gettempl = function(contentId) {
-      console.log("templ");
-      console.log(contentId);
-      self.templateId = contentId;
-      FileDB.get({id:self.templateId}, function(response) { 
-      if(response.success) {
-        self.base64 = angular.injector(['file_service']).get('base64');  
-        
-        $scope.template_content = self.base64.decode(response.content);	  
-        $scope.ace_content = $scope.template_content;
-      }	
-    });
+  $scope.destroy = function() {
+    
+      $scope.content = null;
+      $scope.ace_content = null;
+      $scope.template_content = null;
+      //console.log(response);
+      //$location.path('/');
+
   };
   
   $scope.$watch('template_content + content', function(newValue, oldValue) {
