@@ -196,7 +196,7 @@ app.post('/:db/files', function (req,res){
   if(req.body) {          
     //var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.files.file.name, 'w', {content_type:req.files.file.type,metadata: {'title':req.body.title}}); 
    //var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),'New File', 'w'); 
-    var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.body.filename, 'w',{metadata: {'type':req.body.meta_type}});   
+    var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.body.filename, 'w',{metadata: {'type':req.body.meta_type,'user':req.user}});   
     gridStore.open(function(err, gridStore) {
       gridStore.write(new Buffer(req.body.content, "utf8"),function(err, response) { 
         if(err) { 
