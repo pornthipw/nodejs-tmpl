@@ -51,25 +51,28 @@
          </div>
        </div>
      </div>
-    
-     <div ng-model="ace_content" codemirror="text" class="span5 well">
-       <strong>Editor Panel :</strong> {{document.filename}} 
-       <textarea></textarea>
+     
+     <div class="span5 well">
        <span class="pull-right">
-       <button ng-click="save()" class="btn btn-primary btn-small" ng-show="document"> 
-         <i class="icon-ok icon-white"></i> Save
-       </button>                    
-       <button ng-click="create()" class="btn btn-success  btn-small" ng-show="user.user"> 
-         <i class="icon-plus icon-white"></i> New
-       </button>
-	<button ng-click="convert_to_json()" class="btn btn-small" ng-show="document.metadata.type=='xml'"> 
-         <i class="icon-plus icon-black"></i> ConverttoJSON
-       </button>       
+         <button ng-click="save()" class="btn btn-primary btn-small" ng-show="document"> 
+           <i class="icon-ok icon-white"></i> Save
+         </button>                    
+         <button ng-click="create()" class="btn btn-success  btn-small" ng-show="user.user"> 
+           <i class="icon-plus icon-white"></i> New
+         </button>
+	 <button ng-click="convert_to_json()" class="btn btn-small" ng-show="document.metadata.type=='xml'"> 
+           <i class="icon-plus icon-black"></i> toJSON
+         </button>       
        </span>
- 
-     
-     </div>	  
-     
+       <br>
+       <div class="row-fluid">
+         <div ng-model="ace_content" codemirror="text" class="span12">
+           <strong>Editor Panel :</strong> {{document.filename}} 
+           <textarea></textarea>
+         </div>
+       </div>
+     </div>
+    
      <div class="span4">
        <div class="row-fluid">
          <div class="span12 alert alert-info">

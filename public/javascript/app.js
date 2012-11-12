@@ -1,4 +1,4 @@
-var app = angular.module('gradfile', ['file_service','ace','codemirror']);
+var app = angular.module('gradfile', ['file_service','codemirror']);
 
 app.config(function($routeProvider) {
     $routeProvider.
