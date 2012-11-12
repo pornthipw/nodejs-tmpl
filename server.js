@@ -1,4 +1,5 @@
 var express = require("express");
+var xml2js = require('xml2js');
 var handlebars = require('hbs');
 var mongodb = require('mongodb');
 var passport = require('passport');
@@ -127,7 +128,7 @@ app.get('/', function(req, res){
 //update File
 app.post('/:db/files/:id', function (req,res) {
   var db = req.db;
-  
+  console.log("req.params.id"+req.params.id);
   var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);
   console.log(fileId);   
   mongodb.GridStore.exist(db, fileId, function(err, exist) {                
@@ -135,7 +136,7 @@ app.post('/:db/files/:id', function (req,res) {
       var gridStore = new mongodb.GridStore(db, fileId, 'w');
         gridStore.open(function(err, gridStore) {
         //gridStore.contentType = req.query.contentType;
-        console.log(req.body.content);
+        console.log("content "+req.body.content);
         gridStore.write(new Buffer(req.body.content, "utf8"), function(err, gridStore) {                    
           if(!err) {
             gridStore.close(function(err, result) {                        
@@ -169,6 +170,7 @@ app.post('/:db/metadata/:id', function (req,res) {
         }
         docs['filename'] = req.body.doc_name;
         docs['metadata']['type'] = req.body.meta_type;
+	docs['metadata']['public'] = req.body.meta_public;
         console.log(docs);
         collection.save(docs, {safe:true}, function(err, result) {
           res.json(docs); 
@@ -277,31 +279,70 @@ app.delete('/:db/files/:id',function(req,res){
 });
 
 //List File
-app.get('/:db/files', function(req, res) {  
-  // req.params [year, element, type, item]  
-  console.log('listFile ');
-  if(req.user) {
-    console.log('288');
+app.get('/:db/files', function(req, res) {      
+  if(req.user) {    
     console.log(req.user.identifier);
   }
-  var db = req.db;
-  console.log('listFile ');
+  //console.log("test public");
+  //console.log(req.query.meta_public);
+  var db = req.db;  
   db.collection('fs.files', function(err, collection) {
     if(err) {            
       console.log("Error :"+err);
       res.json({success:false,message:err});              
     }
-    
-    //collection.find().toArray(function(err, docs) {
-    collection.find({"metadata.user.identifier":req.user.identifier}).toArray(function(err, docs) {
-        if(err) {
-          res.json({success:false,message:err});              
-        }
-        res.json(docs);          
-    });            
+    if(req.user) {    
+      collection.find({$or: [{"metadata.public":true},{"metadata.user.identifier":req.user.identifier}]}).toArray(function(err, docs) {
+	  if(err) {
+	    res.json({success:false,message:err});              
+	  }
+	  res.json(docs);          
+      });            
+    } else {
+      // all public file
+      
+      collection.find({"metadata.public":true}).toArray(function(err, docs) {
+	  if(err) {
+	    res.json({success:false,message:err});              
+	  }
+	  res.json(docs);          
+      });  
+      
+      //res.json({success:false,message:"Required Login"});              
+    }
   });                    
 });
 
+//convert to JSON
+app.post('/ajax/xml2json', function(req, res) {
+  console.log("req.body.xml-->"+req.body.xml_content);
+
+    var parser = new xml2js.Parser({
+      attrkey: "$",
+      charkey: "_",
+      explicitArray: false,
+      explicitCharkey: true,
+      mergeAttrs: false,
+      explicitRoot: true,
+      normalize: false,
+    });
+    parser.addListener('end', function(result) {
+      res.json(result);
+    });        
+    
+    var data = new Buffer(req.body.xml_content, 'base64').toString();
+    console.log("data->"+data);
+    parser.parseString(data, function(err, result) {
+      if(err) {                                
+	console.log(err);                               
+        res.json({status:'error while parsing xml',success:false,message:err});
+      }  
+      console.log("result->"+result);
+      //res.json({success:true,message:"OK"});
+      res.json(result);
+            
+    });    
+});
 
 
 app.listen(config.site.port || 3000);

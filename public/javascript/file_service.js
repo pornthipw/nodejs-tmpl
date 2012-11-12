@@ -1,7 +1,7 @@
 var app = angular.module('file_service', ['ngResource']);
 
 app.factory('FileDB', function($resource) {
-    var FileDB  = $resource('grad_file/files/:id', {id:'@id', update: { method: 'PUT' }},{});     
+    var FileDB  = $resource('smis_file/files/:id', {id:'@id'},{});     
     FileDB .prototype.update = function(cb) {
         return FileDB .update({id: this._id.$oid},
             angular.extend({}, this, {_id:undefined}), cb);
@@ -10,10 +10,22 @@ app.factory('FileDB', function($resource) {
 });
 
 app.factory('MetaDB', function($resource) {
-    var MetaDB  = $resource('grad_file/metadata/:id', {id:'@id'},{});                      
+    var MetaDB  = $resource('smis_file/metadata/:id', {id:'@id'},{});                      
     return MetaDB;   
 });
 
+app.factory('Convert', function($resource) {
+  var Convert  = $resource('ajax/xml2json/',  {},{}); 
+    //var Convert  = $resource('ajax/xml2json/',  {update: { method: 'PUT' }},{}); 
+    /*
+    Convert.prototype.update = function(cb) {
+      return Convert.update({content: this._id},
+	angular.extend({}, this, {_id:undefined}), cb);
+      };
+      */
+    
+    return Convert;   
+});
 
 app.factory('User', function($resource) {
     var User  = $resource('user', {}, {});         
@@ -37,6 +49,8 @@ app.factory('base64', function() {
 
     };
 });
+
+
 
 
 /*

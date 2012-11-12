@@ -11,25 +11,25 @@
            <tr ng-repeat="content in content_list |  filter:search ">
              <td>
                <span ng-click="get(content._id)">
-                 <span class="badge badge-success" ng-show="content.metadata.type == 'template'">T</span>	      
-                 <span class="badge badge-info" ng-show="content.metadata.type == 'content'">C</span>	      
+                 <span class="badge badge-success" ng-show="content.metadata.type == 'haml'">T</span>	      
+                 <span class="badge badge-info" ng-show="content.metadata.type == 'json'">C</span>	
+		 <span class="badge" ng-show="content.metadata.type == 'xml'">XML</span>      
                  {{content.filename}} 
                </span>
              </td>
-             <!--
+            
              <td>
                 <span class="pull-right">  
                   <div class="dropdown">
                     <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i><b class="caret"></b></a>
                       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-                        <li><a tabindex="-1" href="#/" ng-click="get(content._id)"><i class="  icon-hand-up"></i> Select</a></li>
                         <li class="divider"></li>
                         <li><a tabindex="-1" href="#/" ng-click="destroy(content._id)" ><i class="icon-remove" ></i> Delete</a></li>
                       </ul>
                   </div>
                 </span>
               </td>
-             -->
+             
            </tr>
          </tbody>
        </table>
@@ -42,9 +42,11 @@
                <label>Type</label>
                <select  ng-model="document.metadata.type" ng-options="i.id as i.name for i in items">
                  <option value=""></option>
-               </select>
-               <a href="#" class="btn btn-primary" ng-click="editMeta()">Update</a>
-             </fieldset>
+               </select> 
+	        Public: <input type="checkbox" ng-model="document.metadata.public">
+	      </fieldset>
+	      
+               <a href="#" class="btn btn-primary" ng-click="editMeta()">Update</a>             
            </form>
          </div>
        </div>
@@ -59,7 +61,10 @@
        </button>                    
        <button ng-click="create()" class="btn btn-success  btn-small" ng-show="user.user"> 
          <i class="icon-plus icon-white"></i> New
-       </button>   
+       </button>
+	<button ng-click="convert_to_json()" class="btn btn-small" ng-show="document.metadata.type=='xml'"> 
+         <i class="icon-plus icon-black"></i> ConverttoJSON
+       </button>       
        </span>
  
      
