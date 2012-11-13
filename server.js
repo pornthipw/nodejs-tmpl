@@ -61,13 +61,13 @@ app.get('/logout', function(req, res){
 app.get('/auth/openid', 
   passport.authenticate('openid', { failureRedirect: '/login' }),
   function(req, res) {
-    res.redirect('/');
+    res.redirect(config.site.baseUrl);
   });
   
 app.get('/auth/openid/return', 
   passport.authenticate('openid', { failureRedirect: '/login' }),
   function(req, res) {
-    res.redirect('/');
+    res.redirect(config.site.baseUrl);
 });
 
 app.get('/user', function(req, res) {

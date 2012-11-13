@@ -1,33 +1,47 @@
 var app = angular.module('gradfile', ['file_service','codemirror']);
 
 app.config(function($routeProvider) {
-    $routeProvider.
-      when('/', {controller:fileCtrl, templateUrl:'static/index.html'}).
-      when('/add', {controller:CreateFileController, templateUrl:'static/form.html'}).
-      when('/edit/content/:contentId', { controller:fileCtrl, templateUrl:'static/form.html'}).
-      when('/add/:contentId', {controller:fileCtrl, templateUrl:'static/form.html'});
+  $routeProvider.when('/', {
+    controller:fileCtrl, 
+    templateUrl:'static/index.html'
+  });
+  $routeProvider.when('/add', {
+    controller:CreateFileController, 
+    templateUrl:'static/form.html'
+  });
+  $routeProvider.when('/edit/content/:contentId', { 
+    controller:fileCtrl, 
+    templateUrl:'static/form.html'
+  });
+  $routeProvider.when('/add/:contentId', {
+    controller:fileCtrl, 
+    templateUrl:'static/form.html'
+  });
 });
 
-function UserCtrl($scope, User,Logout) {
+function UserCtrl($scope, User, Logout) {
   $scope.user = User.get(function(response) {
     console.log(response);
   });
   
   $scope.logout = function(){
     Logout.get(function(response){
-      if (response.success){
-          $scope.user = null;
+      if(response.success){
+        $scope.user = null;
+        $scope.$broadcast('logout');
       }
-      //console.log(response);
     });
-    
   };
-
 }
 
 function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,Logout) {    
   var self = this;
   self.base64 = angular.injector(['file_service']).get('base64'); 
+
+  $scope.$on('logout', function() {
+    $scope.user = null;
+    $scope.content_list = FileDB.query(); 
+  });
   
   $scope.items = [{
         id: 'json',
