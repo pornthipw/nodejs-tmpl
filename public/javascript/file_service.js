@@ -28,10 +28,15 @@ app.factory('Convert', function($resource) {
 });
 
 app.factory('User', function($resource) {
-    var User  = $resource('user', {}, {});         
+    var User  = $resource('user',{}, {});   
     return User;   
 });
 
+
+app.factory('Logout', function($resource) {
+    var Logout  = $resource('logout',{}, {});   
+    return Logout ;   
+});
 
 app.factory('base64', function() {
     return {

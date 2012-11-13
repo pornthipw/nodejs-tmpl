@@ -51,6 +51,12 @@ passport.use(new OpenIDStrategy({
 ));
 
 
+app.get('/logout', function(req, res){
+  req.logOut();
+  //res.redirect('/');
+  res.json({"success":true});
+});
+
 
 app.get('/auth/openid', 
   passport.authenticate('openid', { failureRedirect: '/login' }),
@@ -71,6 +77,10 @@ app.get('/user', function(req, res) {
     res.json({'user':null});
   }
 });
+
+
+
+
 
 
 
@@ -218,8 +228,7 @@ app.get('/:db/files/:id', function (req,res){
   var fields = null;
   if(req.query.fields) {
     fields = JSON.parse(req.query.fields);  
-  }
-  
+  }  
   var gridStore = new mongodb.GridStore(db, fileId, 'r');
     gridStore.open(function(err, gs) {
       var context = {};
@@ -239,7 +248,8 @@ app.get('/:db/files/:id', function (req,res){
               res.json(context);
             }	          
           } else {
-            res.json({success:false});
+	    console.log(err);
+            res.json({success:false,message:err});
           }	  
         });
       });
@@ -249,25 +259,41 @@ app.get('/:db/files/:id', function (req,res){
 });
 
 //delete File 
-app.delete('/:db/files/:id',function(req,res){
+app.delete('/:db/files/:id',function(req,res){  
   console.log('deleteFile '+req.params.id);
   var db = req.db;
   if (req.params.id.length == 24) {
     try {
       fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
       mongodb.GridStore.exist(db, fileId, function(err, exist) {   
-          if(exist) {
+          if(exist) {	    	    
             var gridStore = new mongodb.GridStore(db, fileId, 'w');
-            gridStore.open(function(err, gs) {                        
-                gs.unlink(function(err, result) { 
-              if(!err) {                              
-                  res.json({'response':req.params.id}); 
-                  //client.close();                                        
-              } else {
-                  console.log(err);
-              }
-                });                        
-            });//gridStore.open()
+            gridStore.open(function(err, gs) {  
+	      gs.collection(function(err, collection) {
+		collection.findOne({_id:fileId}, function(err, doc) {
+		  if(err) {
+		    res.json({"success":false, "message":err});
+		  }
+		  console.log(doc.metadata);
+		  console.log(req.user);
+		  if(doc.metadata && req.user) {
+		    if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
+		      gs.unlink(function(err, result) {       
+			if(!err) {                              
+			  res.json({"success":true,"message": req.params.id + " is deleted."}); 			  
+			} else {
+			  res.json({"success":false, "message":" "+err});
+			}
+		      });                        
+		    } else {
+		      res.json({"success":false, "message":"Not Allow!"});
+		    }
+		  } else {
+		    res.json({"success":false, "message":"You are not allow to delete this file."});
+		  }
+		});
+	      });                              
+            });
           } else {
               console.log(id +' does not exists');
           }

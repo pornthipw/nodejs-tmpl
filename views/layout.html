@@ -80,18 +80,15 @@
                         alt="With Twitter"></a></li>-->			 
                 <li>
                     <a href="auth/openid?openid_identifier=https://www.google.com/accounts/o8/id">
-                      <!--<img style="border: 0px"
-                                    src="bootstrap/img/google-friend-connect-6.jpg"
-                                    alt="With Twitter">-->
-		    <img style="border: 0px"
-			src="bootstrap/img/icongoogle-1.gif"
-			alt="With Twitter"> Login with Google
-		    </a>
+                      <img style="border: 0px" src="bootstrap/img/icongoogle-1.gif" alt="With Twitter"> Login with Google
+                    </a>
                 </li>
                 <li class="divider"></li>                            
               </ul>
             </li>
           </ul>
+          <div ng-show="user.user" ><a href ="" ng-click="logout()">Logout</a></div>
+          <!--<div ng-show="user.user"><a href="logout" >Logout</a></div> -->
         </div><!--class="container"--->
       </div><!---class="navbar-inner"-->
     </div><!--class="navbar navbar-inverse navbar-fixed-top"--->

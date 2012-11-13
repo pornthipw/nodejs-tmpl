@@ -8,13 +8,24 @@ app.config(function($routeProvider) {
       when('/add/:contentId', {controller:fileCtrl, templateUrl:'static/form.html'});
 });
 
-function UserCtrl($scope, User) {
+function UserCtrl($scope, User,Logout) {
   $scope.user = User.get(function(response) {
     console.log(response);
   });
+  
+  $scope.logout = function(){
+    Logout.get(function(response){
+      if (response.success){
+          $scope.user = null;
+      }
+      //console.log(response);
+    });
+    
+  };
+
 }
 
-function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert) {    
+function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,Logout) {    
   var self = this;
   self.base64 = angular.injector(['file_service']).get('base64'); 
   
@@ -36,6 +47,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert) 
   //var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
   //  lineNumbers: true                
   //});
+  
   
   $scope.content_list = FileDB.query(); 
     
@@ -157,8 +169,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert) 
 	      $scope.content_list = FileDB.query();
 	    }); 
 	    
-	    
-	    
 	}
 	
 	//if
@@ -174,8 +184,18 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert) 
   };
   
   $scope.destroy = function(contentId) {
-    FileDB.remove({id:contentId}, function(response){
-      $scope.content_list = FileDB.query(); 
+    FileDB.remove({id:contentId}, function(response) {
+      console.log(response);
+      if(response.success) {
+	$scope.content_list = FileDB.query(); 
+      } 
+      $scope.message = response.message;
+	setTimeout(function() {
+	  console.log('clear message');
+	  $scope.$apply(function() {
+	    $scope.message = null;
+	  });
+      }, 3000);
     });
   }; 
   
