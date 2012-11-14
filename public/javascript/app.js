@@ -36,6 +36,17 @@ function UserCtrl($scope, User, Logout) {
 
 function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,Logout) {    
   var self = this;
+  self.curret_type = null;
+  
+  self.run = function() {
+    if($scope.content && $scope.template_content) {
+      console.log($scope.template_content);
+      var template = Handlebars.compile($scope.template_content);
+      console.log(JSON.parse($scope.content));
+      console.log(template(JSON.parse($scope.content)));      
+      $scope.result_tmpl = template(JSON.parse($scope.content));
+    }
+  };
   self.base64 = angular.injector(['file_service']).get('base64'); 
 
   $scope.$on('logout', function() {
@@ -43,16 +54,17 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     $scope.content_list = FileDB.query(); 
   });
   
-  $scope.items = [{
-        id: 'json',
-        name: 'json'},
-    {
-        id: 'haml',
-        name: 'haml'},
-    {
-        id: 'xml',
-        name: 'xml'},
-    ];
+  $scope.items = [
+  {
+    id: 'json',
+    name: 'json'},
+  {
+    id: 'haml',
+    name: 'haml'},
+  {
+    id: 'xml',
+    name: 'xml'},
+  ];
   
   $scope.user = User.get(function(response) {
     console.log(response);
@@ -73,65 +85,71 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
         $scope.document = response.document;
         var meta = response.document.metadata;	        
         if(meta.type) {
+          self.current_type = meta.type;
           if(meta.type == "haml") {
             $scope.template_content = self.base64.decode(response.content);
-            $scope.ace_content = $scope.template_content;
+            $scope.ace_content = $scope.template_content;            
             //self.current_ace = $scope.ace_content;
           } else {	    
             if(meta.type == "json") {
               $scope.content = self.base64.decode(response.content);
               $scope.ace_content = $scope.content;
               //self.current_ace = $scope.ace_content;
-            } 	 
-	    
-	    if(meta.type == "xml") {
-              $scope.xml_content = self.base64.decode(response.content);
-              $scope.ace_content = $scope.xml_content;
-              //self.current_ace = $scope.ace_content;
-            } 	
-	         	    
+            } else {	    
+                if(meta.type == "xml") {
+                  $scope.xml_content = self.base64.decode(response.content);
+                  $scope.ace_content = $scope.xml_content;
+                  //self.current_ace = $scope.ace_content;                        	    
+                } else {
+                  console.log(meta);
+                  console.log(response.content);
+                  $scope.ace_content = self.base64.decode(response.content);          
+                }
+              }
+            }
           }
-        } else {
-	  console.log(meta);
-	  console.log(response.content);
-          $scope.ace_content = self.base64.decode(response.content);
-          //self.current_ace = $scope.ace_content;
         }
-	
-      }
     }); 
   };
   
   $scope.editMeta = function(){
     if(self.current_id) {        
-      console.log($scope.document.metadata.type);  
-      console.log($scope.document.filename); 
-      console.log($scope.document.metadata.public);
-
-      MetaDB.save({id:self.current_id, doc_name:$scope.document.filename,meta_type:$scope.document.metadata.type, meta_public:$scope.document.metadata.public}, function(response) {	
-        if(response.success) {
-          $scope.content_list = MetaDB.query();
-        }
+      MetaDB.save({id:self.current_id, 
+        doc_name:$scope.document.filename,
+        meta_type:$scope.document.
+        metadata.type, 
+        meta_public:$scope.document.metadata.public}, function(response) {	
+          if(response.success) {
+            
+            $scope.content_list = MetaDB.query();
+          }
+          $('#myModal').modal('hide');
+          $scope.content_list = FileDB.query();
       }); 
+      
+      
         
     } else {
     }
+
   };
     
   $scope.save = function() {  
     if(self.current_id) {             
       console.log($scope.ace_content);           
-      FileDB.save({id:self.current_id, content:self.base64.encode($scope.ace_content)}, function(response) {	
-        $scope.content_list = FileDB.query();
-      });    
-    } else {
-      /*
-      $scope.base64 = angular.injector(['file_service']).get('base64');
-      FileDB.save({content:$scope.base64.encode($scope.content)}, function(response) {
-           $scope.content_list = FileDB.query();
-      });  
-      */ 
-    }
+      FileDB.save({id:self.current_id, 
+        content:self.base64.encode($scope.ace_content)}, function(response) {	
+          $scope.content_list = FileDB.query();
+        });    
+      if(self.current_type == 'json') {
+        $scope.content = $scope.ace_content;
+      } else {
+        if(self.current_type == 'haml') {
+          $scope.template_content = $scope.ace_content;
+        }
+      }
+      self.run();
+    } 
   };  
   
   $scope.create = function () {
@@ -151,49 +169,31 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   $scope.convert_to_json = function(){
     console.log("convert to JSON");
     if(self.current_id) {  
-      //console.log(self.current_id);
-      //console.log("content");
-      //console.log($scope.ace_content);
       Convert.save({xml_content:self.base64.encode($scope.ace_content)}, function(response){
-	//console.log(JSON.stringify(["response"]));
-	if(response) {
-	  //console.log("response-->"+JSON.parse(response.result));
-	  console.log("response-->"+JSON.stringify(response));
-	  
-	  FileDB.save({
-	    //content:self.base64.encode("--New JSON File1--"),
-	    //content:self.base64.encode(response),
-	    content:self.base64.encode(JSON.stringify(response)),
-	    filename:"New JSON Document"}, function(response) {
-	      if(response.success) {
-		//$scope.content_list = FileDB.query(); 
-		//$scope.get(response.response._id)
-		console.log("_id -->"+response.response._id);
-		//console.log("filename -->"+response.response.filename);
-		
-		
-		MetaDB.save({id:response.response._id,meta_type:'json',doc_name:response.response.filename}, function(response) {	
-		  if(response.success) {
-		    $scope.get(response.response._id)
-		    $scope.content_list = MetaDB.query();
-		  }
-		}); 
-		
-	      }
-	      $scope.content_list = FileDB.query();
-	    }); 
-	    
-	}
-	
-	//if
-	//if(response.success){
-	//  console.log("OK");
-	//}
-	
+        if(response) {
+          console.log("response-->"+JSON.stringify(response));
+          FileDB.save({
+            content:self.base64.encode(JSON.stringify(response)),
+            filename:"New JSON Document"}, function(response) {
+              
+              if(response.success) {
+                console.log("_id -->"+response.response._id);
+                MetaDB.save({id:response.response._id,
+                  meta_type:'json',
+                  doc_name:response.response.filename}, function(response) {	
+                    
+                    if(response.success) {
+                      $scope.get(response.response._id)
+                      $scope.content_list = MetaDB.query();
+                    }
+                  });
+                   
+              }
+              $scope.content_list = FileDB.query();
+              
+            }); 
+          }
       });
-      //content:self.base64.encode($scope.ace_content)
-      
-       
     };
   };
   
@@ -201,28 +201,34 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     FileDB.remove({id:contentId}, function(response) {
       console.log(response);
       if(response.success) {
-	$scope.content_list = FileDB.query(); 
+        $scope.content_list = FileDB.query(); 
       } 
       $scope.message = response.message;
-	setTimeout(function() {
-	  console.log('clear message');
-	  $scope.$apply(function() {
-	    $scope.message = null;
-	  });
+      setTimeout(function() {
+        console.log('clear message');
+        $scope.$apply(function() {
+          $scope.message = null;
+        });
       }, 3000);
     });
   }; 
   
-  
-  
   $scope.$watch('template_content + content', function(newValue, oldValue) {
-    if($scope.content && $scope.template_content) {
-      var template = Handlebars.compile($scope.template_content);
-      console.log(JSON.parse($scope.content));
-      console.log(template(JSON.parse($scope.content)));      
-      $scope.result_tmpl = template(JSON.parse($scope.content));
-    }
+    self.run();
   });
+  
+  
+  $scope.currentPage = 0;
+  $scope.page = 0;
+  $scope.pageSize = 10;    
+    
+  $scope.numberOfPages=function() {
+    if($scope.content_list) {        
+      var totalPage = Math.ceil($scope.content_list.length/$scope.pageSize);               
+      return totalPage;          
+    }
+  };   
+
 };
 
 app.filter('startFrom', function() {
