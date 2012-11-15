@@ -1,17 +1,29 @@
 var app = angular.module('file_service', ['ngResource']);
 
 app.factory('FileDB', function($resource) {
-    var FileDB  = $resource('smis_file/files/:id', {id:'@id'},{});     
-    FileDB .prototype.update = function(cb) {
-        return FileDB .update({id: this._id.$oid},
+    var FileDB  = $resource('smis_file/files/:id', {id:'@id'},{
+      update: { method: 'PUT' }
+    });     
+    
+    FileDB.prototype.update = function(cb) {
+      console.log('FileDb');
+      console.log(this);
+      console.log(angular.extend({'a':1}, {'b':2}));
+      
+      var x = angular.extend({}, this);
+      console.log('X');
+      console.log(x);
+      return FileDB.update({id: this._id},
             angular.extend({}, this, {_id:undefined}), cb);
     };                    
+    
     return FileDB;   
 });
 
 app.factory('MetaDB', function($resource) {
     var MetaDB  = $resource('smis_file/metadata/:id', {id:'@id'},{});                      
-    return MetaDB;   
+    return MetaDB;               
+    
 });
 
 app.factory('Convert', function($resource) {

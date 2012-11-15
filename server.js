@@ -26,8 +26,8 @@ var test_template = 'PGRpdiBjbGFzcz0iZW50cnkiPg0KICA8aDE+e3t0aXRsZX19PC9oMT4NCiA
 
 var OpenIDStrategy = require('passport-openid').Strategy;
 
-passport.serializeUser(function(user, done) {
-  done(null, user.identifier);
+passport.serializeUser(function(user,done) {
+  done(null, user.identifier, user.profile);
 });
 
 passport.deserializeUser(function(identifier, done) {
@@ -36,16 +36,25 @@ passport.deserializeUser(function(identifier, done) {
 
 passport.use(new OpenIDStrategy({
     returnURL: config.site.baseUrl+'auth/openid/return',
-    realm: config.site.baseUrl
+    realm: config.site.baseUrl,
+    profile: true
   },
   function(identifier, profile, done) {
+    console.log(profile);
     process.nextTick(function () {
+      /*
+      User.findOrCreate({ googleId: profile.id }, function (err, user) { 
+        if (err) { return done(err); } 
+          done(null, { identifier: identifier, profile:profile }); 
+        }); 
+      */
+      
       
       // To keep the example simple, the user's OpenID identifier is returned to
       // represent the logged-in user.  In a typical application, you would want
       // to associate the OpenID identifier with a user record in your database,
       // and return that user instead.
-      return done(null, { identifier: identifier })
+      return done(null, { identifier: identifier, profile:profile })
     });
   }
 ));
@@ -162,6 +171,28 @@ app.post('/:db/files/:id', function (req,res) {
   });
 });
 
+
+app.put('/:db/files/:id', function (req,res) {
+  var db = req.db;        
+  var spec = {'_id': db.bson_serializer.ObjectID.createFromHexString(req.params.id)};  
+  db.collection('fs.files', function(err, collection) {
+    console.log(req.body);
+    res.json({success:true});
+    /*
+    collection.update(spec, req.body, true, function(err, doc) {      
+      if(!err) {
+        res.json({success:true,document:doc});
+        db.close();
+      } else {
+        res.json({success:false, message:err});
+        db.close();
+      }    
+    });
+    */ 
+  });
+});
+
+
 //update Metadata
 app.post('/:db/metadata/:id', function (req,res) {
   console.log("update Metadata");
@@ -174,16 +205,19 @@ app.post('/:db/metadata/:id', function (req,res) {
       res.json({success:false,message:err});              
     }
     
-    collection.findOne({_id:fileId},function(err, docs) {
+    collection.findOne({_id:fileId},function(err, doc) {
         if(err) {
           res.json({success:false,message:err});              
         }
-        docs['filename'] = req.body.doc_name;
-        docs['metadata']['type'] = req.body.meta_type;
-	docs['metadata']['public'] = req.body.meta_public;
-        console.log(docs);
-        collection.save(docs, {safe:true}, function(err, result) {
-          res.json(docs); 
+        doc['filename'] = req.body.doc_name;
+        doc['metadata']['type'] = req.body.meta_type;
+        doc['metadata']['public'] = req.body.meta_public;        
+        collection.save(doc, {safe:true}, function(err, result) {
+          if(!err) {
+            res.json({success:true, document:doc}); 
+          } else {
+            res.json({success:false,message:err});              
+          }
         });
     });;            
   });   

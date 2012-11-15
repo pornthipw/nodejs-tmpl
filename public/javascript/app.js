@@ -36,7 +36,8 @@ function UserCtrl($scope, User, Logout) {
 
 function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,Logout) {    
   var self = this;
-  self.curret_type = null;
+  self.current_type = null;
+  //self.current_document = null;
   
   self.run = function() {
     if($scope.content && $scope.template_content) {
@@ -47,11 +48,24 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       $scope.result_tmpl = template(JSON.parse($scope.content));
     }
   };
+  
+  self.update_file_list = function() {
+    $scope.content_list = FileDB.query(function(response) {
+      angular.forEach(response, function(v, i) {
+        if(v.metadata) {
+          v.type = v.metadata.type;
+        }
+      });
+    });
+  };
+  
+  self.update_file_list();
+  
   self.base64 = angular.injector(['file_service']).get('base64'); 
 
   $scope.$on('logout', function() {
     $scope.user = null;
-    $scope.content_list = FileDB.query(); 
+    self.update_file_list();
   });
   
   $scope.items = [
@@ -75,14 +89,18 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   //});
   
   
-  $scope.content_list = FileDB.query(); 
+  
+  
+  //$scope.template_list = FileDB.query 
     
   $scope.get = function(contentId) {
     self.current_id = contentId;
     FileDB.get({id:contentId, fields:JSON.stringify(["document"])}, function(response) {
       console.log(response);
       if(response.success) {
-        $scope.document = response.document;
+        //self.current_document = response.document;
+        $scope.document = new FileDB(response.document);        
+        console.log($scope.document);
         var meta = response.document.metadata;	        
         if(meta.type) {
           self.current_type = meta.type;
@@ -112,26 +130,28 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     }); 
   };
   
-  $scope.editMeta = function(){
+  $scope.editMeta = function() {
+    /*
     if(self.current_id) {        
       MetaDB.save({id:self.current_id, 
         doc_name:$scope.document.filename,
         meta_type:$scope.document.
         metadata.type, 
         meta_public:$scope.document.metadata.public}, function(response) {	
-          if(response.success) {
-            
-            $scope.content_list = MetaDB.query();
-          }
-          $('#myModal').modal('hide');
-          $scope.content_list = FileDB.query();
-      }); 
-      
-      
-        
-    } else {
+          console.log(response);
+          if(response.success) {          
+            self.update_file_list();
+            // $scope.content_list = MetaDB.query();
+          }     
+          self.update_file_list();               
+      });                         
     }
-
+    */
+    console.log('Document');
+    console.log($scope.document);
+    $scope.document.update(function(response) {
+      console.log(response);
+    });
   };
     
   $scope.save = function() {  
@@ -158,7 +178,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       content:self.base64.encode("--New File--"),
       filename:"New Document"}, function(response) {
         if(response.success) {
-          $scope.content_list = FileDB.query(); 
+          self.update_file_list();
           $scope.get(response.response._id)
         }
     }); 
@@ -184,13 +204,13 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
                     
                     if(response.success) {
                       $scope.get(response.response._id)
-                      $scope.content_list = MetaDB.query();
+                      //$scope.content_list = MetaDB.query();
+                      self.update_file_list();
                     }
                   });
                    
               }
-              $scope.content_list = FileDB.query();
-              
+              self.update_file_list();              
             }); 
           }
       });
@@ -201,7 +221,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     FileDB.remove({id:contentId}, function(response) {
       console.log(response);
       if(response.success) {
-        $scope.content_list = FileDB.query(); 
+        self.update_file_list();
       } 
       $scope.message = response.message;
       setTimeout(function() {
