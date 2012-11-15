@@ -176,19 +176,15 @@ app.put('/:db/files/:id', function (req,res) {
   var db = req.db;        
   var spec = {'_id': db.bson_serializer.ObjectID.createFromHexString(req.params.id)};  
   db.collection('fs.files', function(err, collection) {
-    console.log(req.body);
-    res.json({success:true});
-    /*
     collection.update(spec, req.body, true, function(err, doc) {      
       if(!err) {
-        res.json({success:true,document:doc});
+        res.json({success:true});
         db.close();
       } else {
-        res.json({success:false, message:err});
+        res.json({success:false,message:err});
         db.close();
       }    
     });
-    */ 
   });
 });
 

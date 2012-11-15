@@ -98,9 +98,8 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     FileDB.get({id:contentId, fields:JSON.stringify(["document"])}, function(response) {
       console.log(response);
       if(response.success) {
-        //self.current_document = response.document;
-        $scope.document = new FileDB(response.document);        
-        console.log($scope.document);
+        self.current_document = response.document;
+        $scope.document = new FileDB(self.current_document);        
         var meta = response.document.metadata;	        
         if(meta.type) {
           self.current_type = meta.type;
@@ -147,10 +146,11 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       });                         
     }
     */
-    console.log('Document');
-    console.log($scope.document);
     $scope.document.update(function(response) {
-      console.log(response);
+      if(response.success) {
+        $scope.document._id = self.current_id;
+        self.update_file_list();
+      }
     });
   };
     

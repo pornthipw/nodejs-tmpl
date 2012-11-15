@@ -6,15 +6,8 @@ app.factory('FileDB', function($resource) {
     });     
     
     FileDB.prototype.update = function(cb) {
-      console.log('FileDb');
-      console.log(this);
-      console.log(angular.extend({'a':1}, {'b':2}));
-      
-      var x = angular.extend({}, this);
-      console.log('X');
-      console.log(x);
       return FileDB.update({id: this._id},
-            angular.extend({}, this, {_id:undefined}), cb);
+            angular.extend(this, {_id:undefined}), cb);
     };                    
     
     return FileDB;   
