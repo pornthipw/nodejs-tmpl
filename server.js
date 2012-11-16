@@ -145,46 +145,96 @@ app.get('/', function(req, res){
 });
 
 //update File
-app.post('/:db/files/:id', function (req,res) {
+app.post('/:db/files/:id', function (req,res) {   
   var db = req.db;
-  console.log("req.params.id"+req.params.id);
-  var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);
-  console.log(fileId);   
-  mongodb.GridStore.exist(db, fileId, function(err, exist) {                
-    if(exist) {
-      var gridStore = new mongodb.GridStore(db, fileId, 'w');
-        gridStore.open(function(err, gridStore) {
-        //gridStore.contentType = req.query.contentType;
-        console.log("content "+req.body.content);
-        gridStore.write(new Buffer(req.body.content, "utf8"), function(err, gridStore) {                    
-          if(!err) {
-            gridStore.close(function(err, result) {                        
+  var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);   
+  db.collection('fs.files', function(err, collection) {
+     collection.findOne({_id:fileId}, function(err, doc) {
+       console.log(fileId);
+       if (req.user) {
+         mongodb.GridStore.exist(db, fileId, function(err, exist) {
+           
+          if(exist) {
+            var gridStore = new mongodb.GridStore(db, fileId, 'w');        
+            gridStore.open(function(err, gridStore) {                               
+              gridStore.write(new Buffer(req.body.content, "utf8"), function(err, gridStore) {                    
+                if(!err) {
+                  gridStore.close(function(err, result) {                        
+                    if(!err) {
+                      res.json(result);
+                      db.close();
+                    }
+                  });
+                } else {
+                  res.json({"success":false, "message":err});
+                  db.close();
+                }
+            });  
+           
+        });
+       } else {
+        res.json({"success":false, "message":"You are not allow to update this file."});
+        req.db.close();
+      } 
+    });
+  });
+  /*
+  if (req.user) {
+      mongodb.GridStore.exist(db, fileId, function(err, exist) {                
+        if(exist) {
+          var gridStore = new mongodb.GridStore(db, fileId, 'w');        
+          gridStore.open(function(err, gridStore) {                               
+            gridStore.write(new Buffer(req.body.content, "utf8"), function(err, gridStore) {                    
               if(!err) {
-                res.json(result);
+                gridStore.close(function(err, result) {                        
+                  if(!err) {
+                    res.json(result);
+                    db.close();
+                  }
+                });
+              } else {
+                res.json({"success":false, "message":err});
                 db.close();
               }
-            });
-          }
-        }); 
-      });
-    } 
-  });
+            });           
+          });                    
+        } else {
+          res.json({"success":false, "message":"File not found!"});
+        } 
+      }); 
+  
+  } else {
+    res.json({"success":false, "message":"You are not allow to update this file."});
+    req.db.close();
+  } 
+  */
+  
 });
-
 
 app.put('/:db/files/:id', function (req,res) {
   var db = req.db;        
   var spec = {'_id': db.bson_serializer.ObjectID.createFromHexString(req.params.id)};  
   db.collection('fs.files', function(err, collection) {
-    collection.update(spec, req.body, true, function(err, doc) {      
-      if(!err) {
-        res.json({success:true});
-        db.close();
-      } else {
-        res.json({success:false,message:err});
-        db.close();
-      }    
+      collection.findOne({_id:spec._id}, function(err, doc) {
+        if (req.user) {
+          if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
+            //console.log("spec"+doc.metadata.user.identifier);
+            collection.update(spec, req.body, true, function(err, doc) {  
+              if(!err) {
+                res.json({success:true});
+                db.close();
+              } else {
+                res.json({success:false,message:err});
+                db.close();
+              }     
+            }); 
+
+        }
+      }
     });
+      
+          
+    
   });
 });
 
@@ -200,22 +250,25 @@ app.post('/:db/metadata/:id', function (req,res) {
       console.log("Error :"+err);
       res.json({success:false,message:err});              
     }
-    
-    collection.findOne({_id:fileId},function(err, doc) {
-        if(err) {
-          res.json({success:false,message:err});              
-        }
-        doc['filename'] = req.body.doc_name;
-        doc['metadata']['type'] = req.body.meta_type;
-        doc['metadata']['public'] = req.body.meta_public;        
-        collection.save(doc, {safe:true}, function(err, result) {
-          if(!err) {
-            res.json({success:true, document:doc}); 
-          } else {
+    if (req.user && req.body) {
+      collection.findOne({_id:fileId},function(err, doc) {
+          if(err) {
             res.json({success:false,message:err});              
           }
-        });
-    });;            
+          doc['filename'] = req.body.doc_name;
+          doc['metadata']['type'] = req.body.meta_type;
+          doc['metadata']['public'] = req.body.meta_public;        
+          collection.save(doc, {safe:true}, function(err, result) {
+            if(!err) {
+              res.json({success:true, document:doc}); 
+            } else {
+              res.json({success:false,message:err});              
+            }
+          });
+      });
+    } else {
+       res.json({"success":false, "message":"You are not allow to update this metadata."});
+    }
   });   
   
   });
@@ -278,7 +331,7 @@ app.get('/:db/files/:id', function (req,res){
               res.json(context);
             }	          
           } else {
-	    console.log(err);
+            console.log(err);
             res.json({success:false,message:err});
           }	  
         });
@@ -349,19 +402,19 @@ app.get('/:db/files', function(req, res) {
     }
     if(req.user) {    
       collection.find({$or: [{"metadata.public":true},{"metadata.user.identifier":req.user.identifier}]}).toArray(function(err, docs) {
-	  if(err) {
-	    res.json({success:false,message:err});              
-	  }
-	  res.json(docs);          
+        if(err) {
+          res.json({success:false,message:err});              
+        }
+          res.json(docs);          
       });            
     } else {
       // all public file
       
       collection.find({"metadata.public":true}).toArray(function(err, docs) {
-	  if(err) {
-	    res.json({success:false,message:err});              
-	  }
-	  res.json(docs);          
+        if(err) {
+          res.json({success:false,message:err});              
+        }
+          res.json(docs);          
       });  
       
       //res.json({success:false,message:"Required Login"});              
@@ -371,7 +424,7 @@ app.get('/:db/files', function(req, res) {
 
 //convert to JSON
 app.post('/ajax/xml2json', function(req, res) {
-  console.log("req.body.xml-->"+req.body.xml_content);
+  //console.log("req.body.xml-->"+req.body.xml_content);
 
     var parser = new xml2js.Parser({
       attrkey: "$",
@@ -390,7 +443,7 @@ app.post('/ajax/xml2json', function(req, res) {
     console.log("data->"+data);
     parser.parseString(data, function(err, result) {
       if(err) {                                
-	console.log(err);                               
+        console.log(err);                               
         res.json({status:'error while parsing xml',success:false,message:err});
       }  
       console.log("result->"+result);

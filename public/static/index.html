@@ -1,6 +1,6 @@
 <div class="row-fluid">
   <div class="span12" ng-show="user.user">
-    <label class="control-label" for="inputName">Name: <i class="icon-user"></i> {{user.user.displayName}}{{user.user.identifier}}</label> 
+  <label class="control-label" for="inputName">Name: <i class="icon-user"></i> {{user.user.displayName}}{{user.user.identifier}}</label> 
   </div>
     
   <div class="row-fluid">
@@ -19,7 +19,6 @@
                   <a href="" ng-click="get(content._id)">
                     <i class="icon-list-alt"></i> {{content.filename}}                                      
                     <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span>
-                  </span>
                   </a>                
                 </li>                
               </ul>
@@ -29,7 +28,9 @@
               </li>
               <ul class="unstyled collapse nav nav-list" id="toggle_content">            
                 <li ng-repeat="content in content_list | filter:{type:'json'}">
-                  <a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}}</a>                
+                  <i class></i><a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}} 
+                  <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span>
+                  </a>                
                 </li>                
               </ul>
               <li class="divider"></li>
@@ -38,8 +39,21 @@
               </li>              
               <ul class="unstyled collapse nav nav-list" id="toggle_xml">            
                 <li ng-repeat="content in content_list | filter:{type:'xml'}">
-                  <a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}}</a>                
+                  <a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}}
+                  <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span>
+                  </a>                
                 </li>                
+              </ul>
+              <li class="divider"></li>
+              <li class="nav-header" onclick="$('#toggle_unknow').collapse('toggle')">
+                Unknow Type<i class="icon-chevron-down pull-right"></i>                 
+              </li>
+              <ul class="unstyled collapse nav nav-list" id="toggle_unknow">
+                <li ng-repeat="content in content_list | filter:{type:'unknow'}">
+                  <a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}} 
+                  <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span></a>
+                      
+                </li>
               </ul>
               
             </ul>
@@ -110,20 +124,27 @@
               <button ng-click="create()" class="btn btn-success  btn-small" ng-show="user.user"> 
                 <i class="icon-plus icon-white"></i> New
               </button>
-              <button ng-click="convert_to_json()" class="btn btn-small" ng-show="document.metadata.type=='xml'"> 
+              <button ng-click="convert_to_json()" class="btn btn-small" ng-show="document.metadata.type=='xml' && user.user"> 
                 <i class="icon-plus icon-black"></i> toJSON
-              </button>       
+              </button>  
+              <button ng-click="del()"  class="btn btn-danger  btn-small" ng-show="user.user && document">  <i class="icon-remove icon-white" ></i>Delete
+              </button>
+
             </span>
             <br>
             <div ng-model="ace_content" codemirror="text">
               <strong>Editor Panel :</strong> {{document.filename}} 
+              <span ng-show="user.user">
+                <label class="control-label" for="inputName">
+                    Owner: <i class="icon-user"></i> {{user.user.displayName}}{{user.user.identifier}}
+                </label> 
+              </span>
               <textarea></textarea>
             </div>
           </div>
-          <div class="tab-pane" id="profile">
-            
+          <div class="tab-pane" id="profile" >
             <form class="form-horizontal">
-              <div class="control-group">
+              <div class="control-group" >
                 <label class="control-label" for="inputNmae">Name</label>
                 <div class="controls">
                   <input type="text" id="inputName" ng-model="document.filename">
@@ -153,6 +174,8 @@
               </div>                                                              
             </form>
           </div>
+          
+          
           <div class="tab-pane" id="messages">...</div>
           <div class="tab-pane" id="settings">...</div>
         </div>                                                                 

@@ -21,15 +21,7 @@ app.factory('MetaDB', function($resource) {
 
 app.factory('Convert', function($resource) {
   var Convert  = $resource('ajax/xml2json/',  {},{}); 
-    //var Convert  = $resource('ajax/xml2json/',  {update: { method: 'PUT' }},{}); 
-    /*
-    Convert.prototype.update = function(cb) {
-      return Convert.update({content: this._id},
-	angular.extend({}, this, {_id:undefined}), cb);
-      };
-      */
-    
-    return Convert;   
+  return Convert;   
 });
 
 app.factory('User', function($resource) {
