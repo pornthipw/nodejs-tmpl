@@ -149,66 +149,42 @@ app.post('/:db/files/:id', function (req,res) {
   var db = req.db;
   var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);   
   db.collection('fs.files', function(err, collection) {
-     collection.findOne({_id:fileId}, function(err, doc) {
-       console.log(fileId);
-       if (req.user) {
-         mongodb.GridStore.exist(db, fileId, function(err, exist) {
-           
-          if(exist) {
-            var gridStore = new mongodb.GridStore(db, fileId, 'w');        
-            gridStore.open(function(err, gridStore) {                               
-              gridStore.write(new Buffer(req.body.content, "utf8"), function(err, gridStore) {                    
-                if(!err) {
-                  gridStore.close(function(err, result) {                        
-                    if(!err) {
-                      res.json(result);
-                      db.close();
-                    }
-                  });
-                } else {
-                  res.json({"success":false, "message":err});
-                  db.close();
-                }
-            });  
-           
-        });
+    collection.findOne({_id:fileId}, function(err, doc) {
+      console.log(fileId);
+      if (req.user) {
+        if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
+          mongodb.GridStore.exist(db, fileId, function(err, exist) {
+            if(exist) {
+              var gridStore = new mongodb.GridStore(db, fileId, 'w');        
+              gridStore.open(function(err, gridStore) {                               
+                gridStore.write(new Buffer(req.body.content, "utf8"), function(err, gridStore) {                    
+                  if(!err) {
+                    gridStore.close(function(err, result) {                        
+                      if(!err) {
+                        res.json(result);
+                        db.close();
+                      }
+                    });
+                  } else {
+                    res.json({"success":false, "message":err});
+                    db.close();
+                  }
+              });  
+             
+              });
+            } else {
+              res.json({"success":false, "message":"File not found!"});
+            } 
+          });
+        } else {
+		      res.json({"success":false, "message":"Not Allow!"});
+		    }
        } else {
         res.json({"success":false, "message":"You are not allow to update this file."});
-        req.db.close();
+        db.close();
       } 
     });
   });
-  /*
-  if (req.user) {
-      mongodb.GridStore.exist(db, fileId, function(err, exist) {                
-        if(exist) {
-          var gridStore = new mongodb.GridStore(db, fileId, 'w');        
-          gridStore.open(function(err, gridStore) {                               
-            gridStore.write(new Buffer(req.body.content, "utf8"), function(err, gridStore) {                    
-              if(!err) {
-                gridStore.close(function(err, result) {                        
-                  if(!err) {
-                    res.json(result);
-                    db.close();
-                  }
-                });
-              } else {
-                res.json({"success":false, "message":err});
-                db.close();
-              }
-            });           
-          });                    
-        } else {
-          res.json({"success":false, "message":"File not found!"});
-        } 
-      }); 
-  
-  } else {
-    res.json({"success":false, "message":"You are not allow to update this file."});
-    req.db.close();
-  } 
-  */
-  
 });
 
 app.put('/:db/files/:id', function (req,res) {
@@ -229,12 +205,14 @@ app.put('/:db/files/:id', function (req,res) {
               }     
             }); 
 
-        }
+        } else {
+		      res.json({"success":false, "message":"Not Allow!"});
+		    }
+      } else {
+        res.json({"success":false, "message":"You are not allow to update this metatdata."});
+        db.close();
       }
-    });
-      
-          
-    
+    });      
   });
 });
 
