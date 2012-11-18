@@ -85,13 +85,13 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   $scope.items = [
   {
     id: 'json',
-    name: 'json'},
+    name: 'Content'},
   {
     id: 'haml',
-    name: 'haml'},
+    name: 'Template'},
   {
     id: 'xml',
-    name: 'xml'},
+    name: 'XML'},
   ];
   
   $scope.user = User.get(function(response) {

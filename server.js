@@ -42,18 +42,6 @@ passport.use(new OpenIDStrategy({
   function(identifier, profile, done) {
     console.log(profile);
     process.nextTick(function () {
-      /*
-      User.findOrCreate({ googleId: profile.id }, function (err, user) { 
-        if (err) { return done(err); } 
-          done(null, { identifier: identifier, profile:profile }); 
-        }); 
-      */
-      
-      
-      // To keep the example simple, the user's OpenID identifier is returned to
-      // represent the logged-in user.  In a typical application, you would want
-      // to associate the OpenID identifier with a user record in your database,
-      // and return that user instead.
       return done(null, { identifier: identifier, profile:profile })
     });
   }
@@ -62,7 +50,6 @@ passport.use(new OpenIDStrategy({
 
 app.get('/logout', function(req, res){
   req.logOut();
-  //res.redirect('/');
   res.json({"success":true});
 });
 
@@ -90,20 +77,28 @@ app.get('/user', function(req, res) {
 
 
 
-
-
-
 app.param('db', function(req, res, next) {
-  var db = new mongodb.Db(req.params.db, new mongodb.Server(config.mongodb.server, config.mongodb.port, {'auto_reconnect':true}), {'safe':true});
+  var db = new mongodb.Db(req.params.db, 
+    new mongodb.Server(
+       config.mongodb.server, 
+       config.mongodb.port, 
+       {'auto_reconnect':true}
+    ),{'safe':true}
+  );
+
   db.open(function(err,db) {
     if(err) {
+      console.log('Error Open DB -',err);
       res.send(500, err);
     } else {
       var required_authen = false;
       for(var idx in config.mongodb.auth) {
         if(config.mongodb.auth[idx].name == req.params.db) {
           required_authen = true;
-          db.authenticate(config.mongodb.auth[idx].username, config.mongodb.auth[idx].password, function(err,result) {
+          db.authenticate(
+            config.mongodb.auth[idx].username, 
+            config.mongodb.auth[idx].password, 
+            function(err,result) {
             if(err) {
               res.send(500, err);
             } else {
@@ -177,8 +172,8 @@ app.post('/:db/files/:id', function (req,res) {
             } 
           });
         } else {
-		      res.json({"success":false, "message":"Not Allow!"});
-		    }
+              res.json({"success":false, "message":"Not Allow!"});
+	}
        } else {
         res.json({"success":false, "message":"You are not allow to update this file."});
         db.close();
@@ -189,28 +184,28 @@ app.post('/:db/files/:id', function (req,res) {
 
 app.put('/:db/files/:id', function (req,res) {
   var db = req.db;        
-  var spec = {'_id': db.bson_serializer.ObjectID.createFromHexString(req.params.id)};  
+  var doc_id = db.bson_serializer.ObjectID.createFromHexString(req.params.id);  
   db.collection('fs.files', function(err, collection) {
-      collection.findOne({_id:spec._id}, function(err, doc) {
-        if (req.user) {
-          if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
-            //console.log("spec"+doc.metadata.user.identifier);
-            collection.update(spec, req.body, true, function(err, doc) {  
+    collection.findOne({_id:doc_id}, function(err, doc) {
+      if(req.user) {
+        if(doc.metadata.user.identifier && 
+          (doc.metadata.user.identifier == req.user.identifier)) {
+          collection.update({'_id':doc_id}, req.body, true, 
+            function(err, doc) {  
+              db.close();
               if(!err) {
                 res.json({success:true});
-                db.close();
               } else {
                 res.json({success:false,message:err});
-                db.close();
               }     
             }); 
-
         } else {
-		      res.json({"success":false, "message":"Not Allow!"});
-		    }
+          res.json({"success":false, "message":"Not Allow!"});
+	}
       } else {
-        res.json({"success":false, "message":"You are not allow to update this metatdata."});
         db.close();
+        res.json({"success":false, 
+          "message":"You are not allow to update this metatdata."});
       }
     });      
   });
@@ -259,8 +254,6 @@ app.post('/:db/files', function (req,res){
   console.log(req.body.filename);
   console.log(req.body.meta_type);
   if(req.body) {          
-    //var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.files.file.name, 'w', {content_type:req.files.file.type,metadata: {'title':req.body.title}}); 
-   //var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),'New File', 'w'); 
     var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.body.filename, 'w',{metadata: {'type':req.body.meta_type,'user':req.user}});   
     gridStore.open(function(err, gridStore) {
       gridStore.write(new Buffer(req.body.content, "utf8"),function(err, response) { 
@@ -293,7 +286,6 @@ app.get('/:db/files/:id', function (req,res){
   var gridStore = new mongodb.GridStore(db, fileId, 'r');
     gridStore.open(function(err, gs) {
       var context = {};
-                        
       gs.seek(0, function() {
         gs.read(function(err, data) {	    	    
           if(!err) {
@@ -310,7 +302,13 @@ app.get('/:db/files/:id', function (req,res){
             }	          
           } else {
             console.log(err);
-            res.json({success:false,message:err});
+            gs.unlink(function(u_err, result) {       
+              if(!u_err) {
+                res.json({success:false,message:err});
+              } else {
+                console.log(u_err);
+              }
+            });
           }	  
         });
       });
@@ -335,8 +333,6 @@ app.delete('/:db/files/:id',function(req,res){
 		  if(err) {
 		    res.json({"success":false, "message":err});
 		  }
-		  console.log(doc.metadata);
-		  console.log(req.user);
 		  if(doc.metadata && req.user) {
 		    if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
 		      gs.unlink(function(err, result) {       

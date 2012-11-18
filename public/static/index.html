@@ -5,8 +5,6 @@
     
   <div class="row-fluid">
     <div class="span3">
-      
-      
       <div class="row-fluid">
         <div class="span12">
           <div class="well sidebar-nav">
@@ -61,49 +59,8 @@
         </div>
       </div>
       
-      
-      <strong>File Panel</strong>
-      <table class="table table-striped table-bordered">
-        <tbody>
-          <!--<tr ng-repeat="content in content_list |  filter:search ">-->
-          <tr ng-repeat="content in content_list | orderBy:'uploadDate':true | startFrom:currentPage*pageSize | limitTo:pageSize" > 
-            <td>
-              <span ng-click="get(content._id)">
-              <span class="badge badge-success" ng-show="content.metadata.type == 'haml'">T</span>	      
-              <span class="badge badge-info" ng-show="content.metadata.type == 'json'">C</span>	
-              <span class="badge" ng-show="content.metadata.type == 'xml'">XML</span>      
-              {{content.filename}} 
-              <span class="label label-warning pull-right" ng-show="content.metadata.public == true">Public</span>
-              </span>
-            </td>
-            
-             <td>
-                <span class="pull-right">  
-                  <div class="dropdown">
-                    <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i><b class="caret"></b></a>
-                      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-                        <li><a tabindex="-1" href="#myModal" data-toggle="modal"  ><i class=" icon-edit" ></i> Edit</a></li>
-                        <li><a tabindex="-1" href="#/" ng-click="destroy(content._id)" ><i class="icon-remove" ></i> Delete</a></li>
-                      </ul>
-                  </div>
-                </span>
-              </td>
-           </tr>
-           <tr><td  colspan="2"><span class="form-inline pull-left">#Item/Page </span></td></tr>
-           <tr>
-             <td colspan="2">
-               <span class="form-inline pull-left">
-                {{currentPage+1}} / {{numberOfPages()}}
-                <button class="btn btn" ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1"><<</button>  
-                <button class="btn btn"  ng-disabled="currentPage >= content_list.length/pageSize - 1" ng-click="currentPage=currentPage+1">>></button>
-              </span>
-             </td>
-          </tr>
-         </tbody>
-       </table>
        <div class="row-fluid">
          <div class="span12">
-           
          </div>
        </div>
      </div>
@@ -111,13 +68,13 @@
       <div class="span5 well">
         <ul class="nav nav-tabs">
           <li><a href="#home" data-toggle="tab">Editor</a></li>
-          <li><a href="#profile" data-toggle="tab">Property</a></li>                
+          <li><a href="#profile" data-toggle="tab">Property</a></li>  
         </ul>
         
         
         <div class="tab-content">
           <div class="tab-pane active" id="home">
-            <span class="pull-right">
+            <div class="pull-right">
               <button ng-click="save()" class="btn btn-primary btn-small" ng-show="document"> 
                 <i class="icon-ok icon-white"></i> Save
               </button>                    
@@ -129,19 +86,19 @@
               </button>  
               <button ng-click="del()"  class="btn btn-danger  btn-small" ng-show="user.user && document">  <i class="icon-remove icon-white" ></i>Delete
               </button>
+            </div>
 
-            </span>
-            <br>
             <div ng-model="ace_content" codemirror="text">
-              <strong>Editor Panel :</strong> {{document.filename}} 
-              <span ng-show="user.user">
-                <label class="control-label" for="inputName">
-                    Owner: <i class="icon-user"></i> {{user.user.displayName}}{{user.user.identifier}}
-                </label> 
-              </span>
+            <p><strong>Editor Panel :</strong> {{document.filename}}</p>
+            <small ng-show="document.metadata.user">
+              <i class="icon-user"></i> 
+              {{document.metadata.user.identifier}}
+            </small>
               <textarea></textarea>
             </div>
+
           </div>
+
           <div class="tab-pane" id="profile" >
             <form class="form-horizontal">
               <div class="control-group" >
@@ -174,10 +131,6 @@
               </div>                                                              
             </form>
           </div>
-          
-          
-          <div class="tab-pane" id="messages">...</div>
-          <div class="tab-pane" id="settings">...</div>
         </div>                                                                 
      </div>
     
