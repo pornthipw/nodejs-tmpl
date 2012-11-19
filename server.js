@@ -121,11 +121,11 @@ app.param('db', function(req, res, next) {
 });
 
 app.post('/transform', function(req, res) {  
-  //var data = new Buffer(req.body.data, 'base64').toString();
-  //var template = new Buffer(req.body.template, 'base64').toString(); 
+  var data = new Buffer(req.body.data, 'base64').toString();
+  var template = new Buffer(req.body.template, 'base64').toString(); 
   
-  var data = new Buffer(test_data, 'base64').toString();
-  var template = new Buffer(test_template, 'base64').toString(); 
+  //var data = new Buffer(test_data, 'base64').toString();
+  //var template = new Buffer(test_template, 'base64').toString(); 
   
   var tmpl = handlebars.compile(template);
   var result = tmpl(JSON.parse(data));
@@ -326,13 +326,13 @@ app.delete('/:db/files/:id',function(req,res){
       fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
       mongodb.GridStore.exist(db, fileId, function(err, exist) {   
           if(exist) {	    	    
-            var gridStore = new mongodb.GridStore(db, fileId, 'w');
+            var gridStore = new mongodb.GridStore(db, fileId, 'r');
             gridStore.open(function(err, gs) {  
 	      gs.collection(function(err, collection) {
 		collection.findOne({_id:fileId}, function(err, doc) {
 		  if(err) {
 		    res.json({"success":false, "message":err});
-		  }
+		  } else {
 		  if(doc.metadata && req.user) {
 		    if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
 		      gs.unlink(function(err, result) {       
@@ -341,6 +341,7 @@ app.delete('/:db/files/:id',function(req,res){
 			} else {
 			  res.json({"success":false, "message":" "+err});
 			}
+                        db.close();
 		      });                        
 		    } else {
 		      res.json({"success":false, "message":"Not Allow!"});
@@ -348,6 +349,7 @@ app.delete('/:db/files/:id',function(req,res){
 		  } else {
 		    res.json({"success":false, "message":"You are not allow to delete this file."});
 		  }
+                  }
 		});
 	      });                              
             });

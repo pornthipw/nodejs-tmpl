@@ -11,7 +11,7 @@
     "passport-openid":">= 0.0.0",
     "xml2js":"*"
   },
-  "scripts" :{
-    "start" : "server.js"
+  "scripts" : {
+    "start":"server.js"
   }
 }

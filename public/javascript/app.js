@@ -257,7 +257,9 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       console.log(response);
       if(response.success) {
         self.update_file_list();
-      }       
+      } else {       
+        self.message(response.message);
+      }
     });
   }; 
   
