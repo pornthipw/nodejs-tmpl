@@ -102,9 +102,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   //  lineNumbers: true                
   //});
   
-  
-  
-  
   //$scope.template_list = FileDB.query 
     
   $scope.get = function(contentId) {
@@ -113,26 +110,32 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       console.log(response);
       if(response.success) {
         self.current_document = response.document;
+        
+        console.log("---->"+response.content);
         $scope.document = new FileDB(self.current_document);                
         var meta = response.document.metadata;	        
         if(meta.type) {
           self.current_type = meta.type;
           if(meta.type == "haml") {
             $scope.template_content = self.base64.decode(response.content);
-            $scope.ace_content = $scope.template_content;            
+            $scope.ace_content = $scope.template_content;    
+            $scope.base_64_content = response.content;        
             //self.current_ace = $scope.ace_content;
           } else {	    
             if(meta.type == "json") {
               $scope.content = self.base64.decode(response.content);
               $scope.ace_content = $scope.content;
+              $scope.base_64_content = response.content;
               //self.current_ace = $scope.ace_content;
             } else {	    
                 if(meta.type == "xml") {
                   $scope.xml_content = self.base64.decode(response.content);
                   $scope.ace_content = $scope.xml_content;
+                  $scope.base_64_content = response.content;
                   //self.current_ace = $scope.ace_content;                        	    
                 } else {                                    
-                  $scope.ace_content = self.base64.decode(response.content);          
+                  $scope.ace_content = self.base64.decode(response.content); 
+                  $scope.base_64_content = response.content;         
                 }
               }
             } 

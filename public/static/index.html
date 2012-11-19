@@ -69,6 +69,7 @@
         <ul class="nav nav-tabs">
           <li><a href="#home" data-toggle="tab">Editor</a></li>
           <li><a href="#profile" data-toggle="tab">Property</a></li>  
+          <li><a href="#base64" data-toggle="tab">Base64</a></li>  
         </ul>
         
         
@@ -131,6 +132,10 @@
               </div>                                                              
             </form>
           </div>
+          <div class="tab-pane" id="base64" >
+            <span ng-show="base_64_content"><strong>Base64: </strong><br>{{base_64_content}}hh</span>
+          </div>
+          
         </div>                                                                 
      </div>
     
@@ -159,6 +164,12 @@
            {{result_tmpl}}
          </div>
        </div>
+       <div class="row-fluid">
+        <div class="span 12">
+          <h5>Process</h5> 
+            <img style="border: 0px" src="bootstrap/img/pic_flow.jpg" >
+          </div>
+        </div>
      </div>
    </div>
 </div>
