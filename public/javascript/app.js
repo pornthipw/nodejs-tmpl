@@ -17,6 +17,10 @@ app.config(function($routeProvider) {
     controller:fileCtrl, 
     templateUrl:'static/form.html'
   });
+  $routeProvider.when('/public/:publicType', {
+    controller:fileCtrl, 
+    templateUrl:'static/public.html'
+  });
 });
 
 function UserCtrl($scope, User, Logout) {
@@ -58,8 +62,8 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     }
   };
   
-  self.update_file_list = function() {
-    $scope.content_list = FileDB.query(function(response) {
+  self.update_file_list = function(publicType) {
+    $scope.content_list = FileDB.query({publicType:$scope.publicType},function(response) {
       angular.forEach(response, function(v, i) {
         if(v.metadata) {
             v.type = v.metadata.type;
@@ -145,6 +149,8 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
         }
     }); 
   };
+  
+  
   
   $scope.editMeta = function() {
     /*

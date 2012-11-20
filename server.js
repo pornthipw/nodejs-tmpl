@@ -312,10 +312,9 @@ app.get('/:db/files/:id', function (req,res){
           }	  
         });
       });
-      
-      
     });
 });
+
 
 //delete File 
 app.delete('/:db/files/:id',function(req,res){  
@@ -376,13 +375,15 @@ app.get('/:db/files', function(req, res) {
       console.log("Error :"+err);
       res.json({success:false,message:err});              
     }
-    if(req.user) {    
+    if(req.user) {
+          
       collection.find({$or: [{"metadata.public":true},{"metadata.user.identifier":req.user.identifier}]}).toArray(function(err, docs) {
         if(err) {
           res.json({success:false,message:err});              
         }
           res.json(docs);          
-      });            
+      });   
+               
     } else {
       // all public file
       
@@ -397,6 +398,8 @@ app.get('/:db/files', function(req, res) {
     }
   });                    
 });
+
+
 
 //convert to JSON
 app.post('/ajax/xml2json', function(req, res) {
