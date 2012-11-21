@@ -195,16 +195,17 @@ app.put('/:db/files/:id', function (req,res) {
           (doc.metadata.user.identifier == req.user.identifier)) {
           collection.update({'_id':doc_id}, req.body, true, 
             function(err, doc) {  
-              db.close();
+              db.close(); 
               if(!err) {
                 res.json({success:true});
               } else {
                 res.json({success:false,message:err});
-              }     
+              } 
             }); 
         } else {
           res.json({"success":false, "message":"Not Allow!"});
-	}
+          db.close();
+	      }
       } else {
         db.close();
         res.json({"success":false, 
@@ -240,10 +241,12 @@ app.post('/:db/metadata/:id', function (req,res) {
             } else {
               res.json({success:false,message:err});              
             }
+            db.close();
           });
       });
     } else {
        res.json({"success":false, "message":"You are not allow to update this metadata."});
+       db.close();
     }
   });   
   
@@ -289,7 +292,7 @@ app.get('/:db/files/:id', function (req,res, next){
     gridStore.open(function(err, gs) {
       if(err) {
         console.log(err);                
-        //db.close();
+        db.close();
       } 
       var context = {};
       gs.seek(0, function() {
@@ -301,7 +304,6 @@ app.get('/:db/files/:id', function (req,res, next){
                 collection.findOne({_id:fileId}, function(err, doc) {
                   context['document'] = doc;
                   res.json(context);
-                  console.log('get');
                   db.close();
                 });
               });      		      
@@ -333,37 +335,38 @@ app.delete('/:db/files/:id',function(req,res){
     try {
       fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
       mongodb.GridStore.exist(db, fileId, function(err, exist) {   
-          if(exist) {	    	    
-            var gridStore = new mongodb.GridStore(db, fileId, 'r');
-            gridStore.open(function(err, gs) {  
-	      gs.collection(function(err, collection) {
-		collection.findOne({_id:fileId}, function(err, doc) {
-		  if(err) {
-		    res.json({"success":false, "message":err});
-		  } else {
-		  if(doc.metadata && req.user) {
-		    if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
-		      gs.unlink(function(err, result) {       
-			if(!err) {                              
-			  res.json({"success":true,"message": req.params.id + " is deleted."}); 			  
-			} else {
-			  res.json({"success":false, "message":" "+err});
-			}
-         db.close();
-		      });                        
-		    } else {
-		      res.json({"success":false, "message":"Not Allow!"});
-		    }
-		  } else {
-		    res.json({"success":false, "message":"You are not allow to delete this file."});
-		  }
+        if(exist) {	    	    
+          var gridStore = new mongodb.GridStore(db, fileId, 'r');
+          gridStore.open(function(err, gs) {  
+            gs.collection(function(err, collection) {
+              collection.findOne({_id:fileId}, function(err, doc) {
+                if(err) {
+                  res.json({"success":false, "message":err});
+                } else {
+                  if(doc.metadata && req.user) {
+                    if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
+                      gs.unlink(function(err, result) {       
+                        if(!err) {                              
+                          res.json({"success":true,"message": req.params.id + " is deleted."}); 			  
+                        } else {
+                          res.json({"success":false, "message":" "+err});
+                        }
+                        db.close();
+                      });                        
+                    } else {
+                      res.json({"success":false, "message":"Not Allow!"});
+                    }
+                  } else {
+                    res.json({"success":false, "message":"You are not allow to delete this file."});
                   }
-		});
-	      });                              
-            });
-          } else {
-              console.log(id +' does not exists');
-          }
+                }
+              });
+            });                              
+          });
+        } else {
+          console.log(id +' does not exists');
+          db.close();
+        }
       });
     } catch (err) {
       console.log(err);
