@@ -5,10 +5,6 @@ app.config(function($routeProvider) {
     controller:fileCtrl, 
     templateUrl:'static/index.html'
   });
-  $routeProvider.when('/add', {
-    controller:CreateFileController, 
-    templateUrl:'static/form.html'
-  });
   $routeProvider.when('/edit/content/:contentId', { 
     controller:fileCtrl, 
     templateUrl:'static/form.html'
@@ -17,8 +13,8 @@ app.config(function($routeProvider) {
     controller:fileCtrl, 
     templateUrl:'static/form.html'
   });
-  $routeProvider.when('/public/:publicType', {
-    controller:fileCtrl, 
+  $routeProvider.when('/public', {
+    controller:publicCtrl, 
     templateUrl:'static/public.html'
   });
 });
@@ -37,6 +33,7 @@ function UserCtrl($scope, User, Logout) {
     });
   };
 }
+
 
 function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,Logout) {    
   var self = this;
@@ -62,8 +59,8 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     }
   };
   
-  self.update_file_list = function(publicType) {
-    $scope.content_list = FileDB.query({publicType:$scope.publicType},function(response) {
+  self.update_file_list = function() {
+    $scope.content_list = FileDB.query(function(response) {
       angular.forEach(response, function(v, i) {
         if(v.metadata) {
             v.type = v.metadata.type;
@@ -151,7 +148,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   };
   
   
-  
   $scope.editMeta = function() {
     /*
     if(self.current_id) {        
@@ -183,6 +179,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     });
   };
     
+    
   $scope.save = function() {  
     if(self.current_id) {                   
       FileDB.save({id:self.current_id, 
@@ -205,6 +202,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     } 
   };  
   
+  
   $scope.create = function () {
     self.current_ace = null;
     FileDB.save({
@@ -217,7 +215,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     }); 
   };  
   
-
   
   $scope.convert_to_json = function(){
     console.log("convert to JSON");
@@ -275,18 +272,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   $scope.$watch('template_content + content', function(newValue, oldValue) {
     self.run();
   });
-  
-  
-  $scope.currentPage = 0;
-  $scope.page = 0;
-  $scope.pageSize = 10;    
-    
-  $scope.numberOfPages=function() {
-    if($scope.content_list) {        
-      var totalPage = Math.ceil($scope.content_list.length/$scope.pageSize);               
-      return totalPage;          
-    }
-  };   
 
 };
 
@@ -300,24 +285,77 @@ app.filter('startFrom', function() {
   }
 }); 
 
-
-function CreateFileController($scope, $location, FileDB) {
+function publicCtrl($scope, $location,$routeParams, FileDB,Logout) {  
+  //console.log("test");
+  var self = this;
+  self.base64 = angular.injector(['file_service']).get('base64'); 
   
-    $scope.items = [{
-        id: 'content',
-        name: 'content'},
-    {
-        id: 'template',
-        name: 'template'}];
+  self.Owner_file_list = function() {
+    $scope.content_list = FileDB.query(function(response) {
+      angular.forEach(response, function(v, i) {
+        if(v.metadata) {
+            v.user = v.metadata.user;         
+        } 
+      });
+    });
+  };
+  
+  self.Owner_file_list();
+  //$scope.content_list = FileDB.query();
+  
+  $scope.get = function(contentId) {
+    self.current_id = contentId;
+    FileDB.get({id:contentId, fields:JSON.stringify(["document"])}, function(response) {
+      console.log(response);
+      if(response.success) {
+        self.current_document = response.document;
         
-  $scope.save = function() {    
-    $scope.base64 = angular.injector(['file_service']).get('base64');
-    console.log("encode-base64", $scope.base64.encode($scope.content));
-    console.log("$scope.content"+$scope.content);
-    //FileDB.save({content:$scope.base64.encode($scope.content),filename:$scope.base64.encode($scope.filename),meta_type:$scope.base64.encode($scope.meta_type)}, function(response) {
-    FileDB.save({content:$scope.base64.encode($scope.content),filename:$scope.filename,meta_type:$scope.meta_type}, function(response) {
-    //FileDB.save({content:$scope.base64.encode($scope.content)}, function(response) {
-     $location.path('/');
+        console.log("---->"+response.content);
+        $scope.document = new FileDB(self.current_document);                
+        var meta = response.document.metadata;	        
+        if(meta.type) {
+          self.current_type = meta.type;
+          if(meta.type == "haml") {
+            $scope.template_content = self.base64.decode(response.content);
+            $scope.ace_content = $scope.template_content;    
+            $scope.base_64_content = response.content;        
+            //self.current_ace = $scope.ace_content;
+          } else {	    
+            if(meta.type == "json") {
+              $scope.content = self.base64.decode(response.content);
+              $scope.ace_content = $scope.content;
+              $scope.base_64_content = response.content;
+              //self.current_ace = $scope.ace_content;
+            } else {	    
+                if(meta.type == "xml") {
+                  $scope.xml_content = self.base64.decode(response.content);
+                  $scope.ace_content = $scope.xml_content;
+                  $scope.base_64_content = response.content;
+                  //self.current_ace = $scope.ace_content;                        	    
+                } else {                                    
+                  $scope.ace_content = self.base64.decode(response.content); 
+                  $scope.base_64_content = response.content;         
+                }
+              }
+            } 
+          } else {            
+              $scope.ace_content = self.base64.decode(response.content);          
+          }
+        }
     }); 
-  };  
+  };
+  
+  $scope.currentPage = 0;
+  $scope.page = 0;
+  $scope.pageSize = 10;    
+    
+  $scope.numberOfPages=function() {
+    if($scope.content_list) {        
+      var totalPage = Math.ceil($scope.content_list.length/$scope.pageSize);               
+      return totalPage;          
+    }
+  };   
+  
 }
+
+

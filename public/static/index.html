@@ -1,6 +1,6 @@
 <div class="row-fluid">
   <div class="span12" ng-show="user.user">
-  <label class="control-label" for="inputName">Name: <i class="icon-user"></i> {{user.user.displayName}}{{user.user.identifier}}</label> 
+    <label class="control-label" for="inputName">Name: <i class="icon-user"></i> {{user.user.displayName}}{{user.user.identifier}}</label> 
   </div>
     
   <div class="row-fluid">
@@ -59,66 +59,60 @@
         </div>
       </div>
       
-       <div class="row-fluid">
-         <div class="span12">
-         </div>
-       </div>
-     </div>
+      <div class="row-fluid">
+        <div class="span12"></div>
+      </div>
+    </div>
      
-      <div class="span5 well">
-        <ul class="nav nav-tabs">
-          <li><a href="#home" data-toggle="tab">Editor</a></li>
-          <li><a href="#profile" data-toggle="tab">Property</a></li>  
-          <li><a href="#base64" data-toggle="tab">Base64</a></li>  
-        </ul>
-        
-        
-        <div class="tab-content">
-          <div class="tab-pane active" id="home">
-            <div class="pull-right">
-              <button ng-click="save()" class="btn btn-primary btn-small" ng-show="document"> 
-                <i class="icon-ok icon-white"></i> Save
-              </button>                    
-              <button ng-click="create()" class="btn btn-success  btn-small" ng-show="user.user"> 
-                <i class="icon-plus icon-white"></i> New
-              </button>
-              <button ng-click="convert_to_json()" class="btn btn-small" ng-show="document.metadata.type=='xml' && user.user"> 
-                <i class="icon-plus icon-black"></i> toJSON
-              </button>  
-              <button ng-click="del()"  class="btn btn-danger  btn-small" ng-show="user.user && document">  <i class="icon-remove icon-white" ></i>Delete
-              </button>
-            </div>
+    <div class="span5 well">
+      <ul class="nav nav-tabs">
+        <li><a href="#home" data-toggle="tab">Editor</a></li>
+        <li><a href="#profile" data-toggle="tab">Property</a></li>  
+        <li><a href="#base64" data-toggle="tab">Base64</a></li>  
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="home">
+          <div class="pull-right">
+            <button ng-click="save()" class="btn btn-primary btn-small" ng-show="document"> 
+              <i class="icon-ok icon-white"></i> Save
+            </button>                    
+            <button ng-click="create()" class="btn btn-success  btn-small" ng-show="user.user"> 
+              <i class="icon-plus icon-white"></i> New
+            </button>
+            <button ng-click="convert_to_json()" class="btn btn-small" ng-show="document.metadata.type=='xml' && user.user"> 
+              <i class="icon-plus icon-black"></i> toJSON
+            </button>  
+            <button ng-click="del()"  class="btn btn-danger  btn-small" ng-show="user.user && document">  
+              <i class="icon-remove icon-white" ></i>
+                Del
+            </button>
+          </div>
 
-            <div ng-model="ace_content" codemirror="text">
+          <div ng-model="ace_content" codemirror="text">
             <p><strong>Editor Panel :</strong> {{document.filename}}</p>
             <small ng-show="document.metadata.user">
               <i class="icon-user"></i> 
               {{document.metadata.user.identifier}}
             </small>
-              <textarea></textarea>
-            </div>
-
+            <textarea></textarea>
           </div>
-
-          <div class="tab-pane" id="profile" >
-            <form class="form-horizontal">
-              <div class="control-group" >
-                <label class="control-label" for="inputNmae">Name</label>
+        </div>
+        <div class="tab-pane" id="profile" >
+          <form class="form-horizontal">
+            <div class="control-group" >
+              <label class="control-label" for="inputNmae">Name</label>
                 <div class="controls">
                   <input type="text" id="inputName" ng-model="document.filename">
                 </div>
-              </div>
-              
-              <div class="control-group">
-                <label class="control-label" for="inputType">Type</label>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="inputType">Type</label>
                 <div class="controls">
                   <select  ng-model="document.metadata.type" ng-options="i.id as i.name for i in items">
                     <option value=""></option>
                   </select> 
                 </div>
               </div>
-              
-              
               <div class="control-group">                
                 <div class="controls">
                   <label class="checkbox">
@@ -136,22 +130,26 @@
             <blockquote>
             <span ng-show="base_64_content"><strong>Base64: </strong><br>{{base_64_content}}</span>
             </blockquote>
-          </div>
-          
+          </div><!--
+          <div class="pull-right">            
+            <button ng-click="del()"  class="btn btn-danger  btn-small" ng-show="user.user && document">  
+              <i class="icon-remove icon-white" ></i>
+                Delete
+            </button>
+          </div>-->
         </div>                                                                 
-     </div>
+    </div>
     
-     <div class="span4">
-       <div class="row-fluid">
-	<div class="alert alert-block" ng-show="message">	  
-	  <strong>Message :</strong> {{message}}
-	</div>
+    <div class="span4">
+      <div class="row-fluid">
+        <div class="alert alert-block" ng-show="message">	  
+          <strong>Message :</strong> {{message}}
+        </div>
       </div>             
-       
-       <div class="row-fluid">
-         <div class="span12 alert alert-info">
-           <h5>Content</h5>
-           {{content}}
+      <div class="row-fluid">
+        <div class="span12 alert alert-info">
+          <h5>Content</h5>
+            {{content}}
          </div>
        </div>
        <div class="row-fluid">
@@ -166,44 +164,9 @@
            {{result_tmpl}}
          </div>
        </div>
-       <div class="row-fluid">
-        <div class="span 12">
-          <h5>Process</h5> 
-            <img style="border: 0px" src="bootstrap/img/pic_flow.jpg" >
-          </div>
-        </div>
      </div>
    </div>
 </div>
 
 
-<form >                  
-  <!--<div class="modal hide fade" id="myModal">-->
-  <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      <h3 id="myModalLabel"> Update Metadata</h3>
-    </div>
-    
-    <div class="modal-body">
-      <p>             
-        <fieldset>
-          <label>Name</label>
-          <input type="text" ng-model="document.filename" > 
-          <label>Type</label>
-          <select  ng-model="document.metadata.type" ng-options="i.id as i.name for i in items">
-          <option value=""></option>
-          </select> 
-              Public: <input type="checkbox" ng-model="document.metadata.public">
-          </fieldset> 
-      </p>
-    </div>
-   
-    <div class="modal-footer">                    
-      <button type="submit" class="btn btn-primary start" ng-click="editMeta()">
-        <i class="icon-upload icon-white"></i>
-        <span>Update</span>
-      </button>                                
-    </div><!--div class="modal-footer"---->
-  </div><!--class="modal hide fade"-->
-</form>
+
