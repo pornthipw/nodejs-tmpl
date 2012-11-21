@@ -48,6 +48,7 @@ passport.use(new OpenIDStrategy({
 ));
 
 
+
 app.get('/logout', function(req, res){
   req.logOut();
   res.json({"success":true});
@@ -104,7 +105,7 @@ app.param('db', function(req, res, next) {
             } else {
               if(result) {
                 req.db = db;
-                next();
+                next();                
               } else {
                 res.send(403, 'Unauthorized');
               }
@@ -114,7 +115,9 @@ app.param('db', function(req, res, next) {
       }
       if(!required_authen) {
         req.db = db;
+        //console.log('+done');
         next();
+        //console.log('-done');
       }
     }
   });
@@ -274,9 +277,8 @@ app.post('/:db/files', function (req,res){
 });
 
 
-
 //get File
-app.get('/:db/files/:id', function (req,res){
+app.get('/:db/files/:id', function (req,res, next){
   var db = req.db;
   fileId = new mongodb.ObjectID.createFromHexString(req.params.id);
   var fields = null;
@@ -285,6 +287,10 @@ app.get('/:db/files/:id', function (req,res){
   }  
   var gridStore = new mongodb.GridStore(db, fileId, 'r');
     gridStore.open(function(err, gs) {
+      if(err) {
+        console.log(err);                
+        //db.close();
+      } 
       var context = {};
       gs.seek(0, function() {
         gs.read(function(err, data) {	    	    
@@ -295,26 +301,29 @@ app.get('/:db/files/:id', function (req,res){
                 collection.findOne({_id:fileId}, function(err, doc) {
                   context['document'] = doc;
                   res.json(context);
+                  console.log('get');
+                  db.close();
                 });
               });      		      
             } else {
               res.json(context);
+              db.close();
             }	          
           } else {
             console.log(err);
             gs.unlink(function(u_err, result) {       
               if(!u_err) {
-                res.json({success:false,message:err});
+                res.json({success:false,message:err});                
               } else {
                 console.log(u_err);
               }
+              db.close();
             });
           }	  
         });
       });
     });
 });
-
 
 //delete File 
 app.delete('/:db/files/:id',function(req,res){  
@@ -340,7 +349,7 @@ app.delete('/:db/files/:id',function(req,res){
 			} else {
 			  res.json({"success":false, "message":" "+err});
 			}
-                        db.close();
+         db.close();
 		      });                        
 		    } else {
 		      res.json({"success":false, "message":"Not Allow!"});
@@ -362,49 +371,42 @@ app.delete('/:db/files/:id',function(req,res){
   }
 });
 
+
 //List File
-app.get('/:db/files', function(req, res) {      
-  if(req.user) {    
-    console.log(req.user.identifier);
-  }
-  //console.log("test public");
-  //console.log(req.query.meta_public);
-  var db = req.db;  
+app.get('/:db/files', function(req, res) {
+  var db = req.db; 
+  //console.log('list'); 
   db.collection('fs.files', function(err, collection) {
     if(err) {            
       console.log("Error :"+err);
       res.json({success:false,message:err});              
+      db.close();
     }
-    if(req.user) {
-          
+    if(req.user) {          
       collection.find({$or: [{"metadata.public":true},{"metadata.user.identifier":req.user.identifier}]}).toArray(function(err, docs) {
         if(err) {
-          res.json({success:false,message:err});              
-        }
+          res.json({success:false,message:err});                        
+        } else {
           res.json(docs);          
-      });   
-               
-    } else {
-      // all public file
-      
+        }
+        db.close();
+      });                  
+    } else {            
       collection.find({"metadata.public":true}).toArray(function(err, docs) {
         if(err) {
           res.json({success:false,message:err});              
-        }
+        } else {          
           res.json(docs);          
-      });  
-      
-      //res.json({success:false,message:"Required Login"});              
+        }
+        db.close();
+      });              
     }
   });                    
 });
 
-
-
 //convert to JSON
 app.post('/ajax/xml2json', function(req, res) {
   //console.log("req.body.xml-->"+req.body.xml_content);
-
     var parser = new xml2js.Parser({
       attrkey: "$",
       charkey: "_",
@@ -431,7 +433,6 @@ app.post('/ajax/xml2json', function(req, res) {
             
     });    
 });
-
 
 app.listen(config.site.port || 3000);
 //app.listen(3000);
