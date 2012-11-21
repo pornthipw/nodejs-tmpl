@@ -17,6 +17,11 @@ app.config(function($routeProvider) {
     controller:publicCtrl, 
     templateUrl:'static/public.html'
   });
+  $routeProvider.when('/document', {
+    controller:fileCtrl,
+    templateUrl:'static/document.html'
+  });
+
 });
 
 function UserCtrl($scope, User, Logout) {
