@@ -19,7 +19,6 @@
                     <i class="icon-list-alt"></i> {{content.filename}}                                      
                     <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span>
                   </a> 
-                   {{content.metadata.user}}                
                 </li>                
               </ul>
               
@@ -78,24 +77,6 @@
 
       <div class="tab-content">
         <div class="tab-pane active" id="home">
-          <div class="btn-group pull-right">
-            <button class="btn" ng-click="save()" ng-show="document">
-              <i class="icon-ok icon-black"></i> Save
-            </button>
-            <button class="btn" ng-click="create()" ng-show="user.user">
-              <i class="icon-plus icon-black"></i> New
-            </button>
-            <button class="btn" ng-click="convert_to_json()" ng-show="document.metadata.type=='xml' && user.user">
-              <i class="icon-plus icon-black"></i> toJSON
-            </button>
-            <button class="btn" ng-click="del()" ng-show="user.user && document">
-              <i class="icon-remove icon-black" ></i>
-                Del
-            </button>
-          </div>
-      <!--
-      <div class="tab-content">
-        <div class="tab-pane active" id="home">
           <div class="pull-right">
             <button ng-click="save()" class="btn btn-primary btn-small" ng-show="document"> 
               <i class="icon-ok icon-white"></i> Save
@@ -111,7 +92,6 @@
                 Del
             </button>
           </div>
-          -->
           
           <div ng-model="ace_content" codemirror="text">
           <strong>Editor Panel :</strong>{{document.filename}} <br>

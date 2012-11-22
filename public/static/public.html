@@ -1,35 +1,44 @@
 <div class="row-fluid">    
-  
-  
   <div class="span12" ng-show="user.user">
     <label class="control-label" for="inputName">Name: <i class="icon-user"></i> {{user.user.displayName}}{{user.user.identifier}}</label> 
   </div>
-  
+
   <div class="row-fluid">
     <div class="span7">
-      <strong>List of Public File </strong>    
-      <ul>
-        <li ng-repeat="user in content_list">
-          {{user.name}}
-          <ul>
-            <li ng-repeat="content in user.files">
-              <span ng-click="get(content._id)">
-                <span class="badge badge-success" ng-show="content.metadata.type == 'haml'">T</span>	      
-                <span class="badge badge-info" ng-show="content.metadata.type == 'json'">C</span>	
-                <span class="badge" ng-show="content.metadata.type == 'xml'">XML</span>      
-                {{content.filename}} 
-                <blockquote>
-                 <small><span ng-bind="content.metadata.user.identifier"></span></small>
-                </blockquote>
-              </span>
-            </li>
-          </ul>
-        </li>
-      </ul>                  
+      <div class="accordion" id="accordion1">
+        <div class="accordion-group" ng-repeat="user in content_list">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse"
+               data-parent="#accordion1" href="#collapse{{$index}}">
+               {{user.name}}
+            </a>
+          </div>
+          <div id="collapse{{$index}}" class="accordion-body collapse">
+            <div class="accordion-inner">
+              <ul>
+                <li ng-repeat="content in user.files">
+                  <span ng-click="get(content._id)">
+                    <span class="badge badge-success" 
+                        ng-show="content.metadata.type == 'haml'">T
+                    </span>	      
+                    <span class="badge badge-info" 
+                        ng-show="content.metadata.type == 'json'">C
+                    </span>	
+                    <span class="badge" 
+                        ng-show="content.metadata.type == 'xml'">XML
+                    </span>      
+                    {{content.filename}} 
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-   
+
     <div class="span5">
-      <div class="tab-content">
+      <div class="tab-content well">
         <div ng-model="ace_content" codemirror="text">
           <strong>Content:</strong> {{document.filename}} 
           <span ng-show="user.user">
@@ -41,6 +50,5 @@
         </div>
       </div>
     </div>                                                                 
-   </div>
   </div>
 </div>

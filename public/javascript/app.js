@@ -296,6 +296,7 @@ app.filter('startFrom', function() {
 function publicCtrl($scope, $location,$routeParams, FileDB,Logout) {    
   var self = this;
   self.base64 = angular.injector(['file_service']).get('base64'); 
+  $scope.file_list = FileDB.query();
   
   
   FileDB.query(function(response) {
