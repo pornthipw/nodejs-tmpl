@@ -69,6 +69,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       angular.forEach(response, function(v, i) {
         if(v.metadata) {
             v.type = v.metadata.type;
+            v.user = v.metadata.user;
             if (v.type == null  ) {
               console.log("found null");
               v.type = 'unknow';
