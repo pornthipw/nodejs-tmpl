@@ -11,24 +11,29 @@
             <ul class="nav nav-list">
               <li class="nav-header" onclick="$('#toggle_template').collapse('toggle')">
                 Template <i class="icon-chevron-down pull-right"></i>                 
-              </li>              
+              </li>
+                            
               <ul class="unstyled collapse nav nav-list" id="toggle_template">            
-                <li ng-repeat="content in content_list | filter:{type:'haml'}">
+                <li ng-repeat="content in content_list | filter:{type:'haml'} "> 
                   <a href="" ng-click="get(content._id)">
                     <i class="icon-list-alt"></i> {{content.filename}}                                      
                     <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span>
-                  </a>                
+                  </a> 
+                   {{content.metadata.user}}                
                 </li>                
               </ul>
+              
               <li class="divider"></li>
               <li class="nav-header" onclick="$('#toggle_content').collapse('toggle')">
                 Content <i class="icon-chevron-down pull-right"></i>                 
               </li>
+              
               <ul class="unstyled collapse nav nav-list" id="toggle_content">            
                 <li ng-repeat="content in content_list | filter:{type:'json'}">
+                  
                   <i class></i><a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}} 
                   <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span>
-                  </a>                
+                  </a>         
                 </li>                
               </ul>
               <li class="divider"></li>

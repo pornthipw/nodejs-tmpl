@@ -42,8 +42,7 @@ function UserCtrl($scope, User, Logout) {
 
 function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,Logout) {    
   var self = this;
-  self.current_type = null;
-  //self.current_document = null;
+  self.current_type = null;  
   
   self.message = function(message) {
     $scope.message = message;
@@ -55,32 +54,40 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   };
   
   self.run = function() {
-    if($scope.content && $scope.template_content) {
-      console.log($scope.template_content);
-      var template = Handlebars.compile($scope.template_content);
-      console.log(JSON.parse($scope.content));
-      console.log(template(JSON.parse($scope.content)));      
+    if($scope.content && $scope.template_content) {      
+      var template = Handlebars.compile($scope.template_content);      
       $scope.result_tmpl = template(JSON.parse($scope.content));
     }
   };
   
   self.update_file_list = function() {
-    $scope.content_list = FileDB.query(function(response) {
-      angular.forEach(response, function(v, i) {
+    FileDB.query(function(response) {
+      var result = [];
+      if($scope.user == null) return result;
+            
+      angular.forEach(response, function(v, i) {                
         if(v.metadata) {
             v.type = v.metadata.type;
             v.user = v.metadata.user;
-            if (v.type == null  ) {
-              console.log("found null");
-              v.type = 'unknow';
+            if($scope.user.user.identifier == v.metadata.user.identifier) {              
+              console.log(v);
+              if (v.type == null ) {              
+                v.type = 'unknow';              
+              }         
+              result.push(v);
             }
-         
         } 
+        $scope.content_list = result;
       });
     });
   };
   
-  self.update_file_list();
+  
+  $scope.user = User.get(function(response) {
+    self.update_file_list();    
+  });
+  
+  
   
   self.base64 = angular.injector(['file_service']).get('base64'); 
 
@@ -101,9 +108,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     name: 'XML'},
   ];
   
-  $scope.user = User.get(function(response) {
-    console.log(response);
-  });
+  
   
   //var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
   //  lineNumbers: true                
@@ -185,7 +190,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     });
   };
     
-    
   $scope.save = function() {  
     if(self.current_id) {                   
       FileDB.save({id:self.current_id, 
@@ -208,7 +212,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     } 
   };  
   
-  
   $scope.create = function () {
     self.current_ace = null;
     FileDB.save({
@@ -220,7 +223,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
         }
     }); 
   };  
-  
   
   $scope.convert_to_json = function(){
     console.log("convert to JSON");
@@ -291,23 +293,29 @@ app.filter('startFrom', function() {
   }
 }); 
 
-function publicCtrl($scope, $location,$routeParams, FileDB,Logout) {  
-  //console.log("test");
+function publicCtrl($scope, $location,$routeParams, FileDB,Logout) {    
   var self = this;
   self.base64 = angular.injector(['file_service']).get('base64'); 
   
-  self.Owner_file_list = function() {
-    $scope.content_list = FileDB.query(function(response) {
-      angular.forEach(response, function(v, i) {
-        if(v.metadata) {
-            v.user = v.metadata.user;         
-        } 
-      });
-    });
-  };
   
-  self.Owner_file_list();
-  //$scope.content_list = FileDB.query();
+  FileDB.query(function(response) {
+    var user_dict = {};
+    angular.forEach(response, function(v, i) {
+      if(v.metadata) {
+        if(v.metadata.public) {
+          var id = v.metadata.user.identifier;
+          if(!(id in user_dict)) {
+            user_dict[id] = {'name':id, 'files':[]};
+          }        
+          user_dict[id]['files'].push(v);
+        }
+      } 
+    });
+    $scope.content_list = user_dict;
+  });
+
+  
+  
   
   $scope.get = function(contentId) {
     self.current_id = contentId;
