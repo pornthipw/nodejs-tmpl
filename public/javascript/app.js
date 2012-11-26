@@ -71,7 +71,12 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       angular.forEach(response, function(v, i) {                
         if(v.metadata) {
             v.type = v.metadata.type;
-            if (v.type == 'haml') 
+            v.user = v.metadata.user;
+            if($scope.user.user.identifier == v.metadata.user.identifier) { 
+                           
+              //console.log(v);
+              
+              if (v.type == 'haml') 
               { 
                 $scope.total_haml ++; 
               } else {
@@ -80,15 +85,14 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
                 } else {
                   if (v.type == 'xml') {
                     $scope.total_xml ++;
-                  } 
+                  } else {
+                    if (v.type == null ) {              
+                      v.type = 'unknown'; 
+                      $scope.total_unknown++;             
+                    }    
+                  }
                 }
               }
-            v.user = v.metadata.user;
-            if($scope.user.user.identifier == v.metadata.user.identifier) {              
-              //console.log(v);
-              if (v.type == null ) {              
-                v.type = 'unknown';              
-              }         
               result.push(v);
             }
         }
