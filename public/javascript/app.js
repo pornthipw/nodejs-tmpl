@@ -310,9 +310,11 @@ function publicCtrl($scope, $location,$routeParams, FileDB,Logout) {
         if(v.metadata.public) {
           var id = v.metadata.user.identifier;
           if(!(id in user_dict)) {
-            user_dict[id] = {'name':id, 'files':[]};
+            user_dict[id] = {'name':id, 'files':[],'count':0};
           }        
           user_dict[id]['files'].push(v);
+          user_dict[id]['count']++;
+          console.log(user_dict[id]['count']);
         }
       } 
     });
