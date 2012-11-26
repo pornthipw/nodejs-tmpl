@@ -10,7 +10,7 @@
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
               <li class="nav-header" onclick="$('#toggle_template').collapse('toggle')">
-                Template <i class="icon-chevron-down pull-right"></i>                 
+                Template  : {{total_haml}}<i class="icon-chevron-down pull-right"></i>                 
               </li>
                             
               <ul class="unstyled collapse nav nav-list" id="toggle_template">            
@@ -24,7 +24,7 @@
               
               <li class="divider"></li>
               <li class="nav-header" onclick="$('#toggle_content').collapse('toggle')">
-                Content <i class="icon-chevron-down pull-right"></i>                 
+                Content : {{total_json}} <i class="icon-chevron-down pull-right"></i>                 
               </li>
               
               <ul class="unstyled collapse nav nav-list" id="toggle_content">            
@@ -37,7 +37,7 @@
               </ul>
               <li class="divider"></li>
               <li class="nav-header" onclick="$('#toggle_xml').collapse('toggle')">
-                XML <i class="icon-chevron-down pull-right"></i>                 
+                XML : {{total_xml}} <i class="icon-chevron-down pull-right"></i>                 
               </li>              
               <ul class="unstyled collapse nav nav-list" id="toggle_xml">            
                 <li ng-repeat="content in content_list | filter:{type:'xml'}">
@@ -48,10 +48,10 @@
               </ul>
               <li class="divider"></li>
               <li class="nav-header" onclick="$('#toggle_unknow').collapse('toggle')">
-                Unknow Type<i class="icon-chevron-down pull-right"></i>                 
+                Unknown Type : {{total_unknown}}<i class="icon-chevron-down pull-right"></i>                 
               </li>
               <ul class="unstyled collapse nav nav-list" id="toggle_unknow">
-                <li ng-repeat="content in content_list | filter:{type:'unknow'}">
+                <li ng-repeat="content in content_list | filter:{type:'unknown'}">
                   <a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}} 
                   <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span></a>
                       
