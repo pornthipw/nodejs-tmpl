@@ -10,7 +10,7 @@
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
               <li class="nav-header" onclick="$('#toggle_template').collapse('toggle')">
-                Template  : {{total_haml}}<i class="icon-chevron-down pull-right"></i>                 
+                Template <i class="icon-chevron-down pull-right"></i>                 
               </li>
                             
               <ul class="unstyled collapse nav nav-list" id="toggle_template">            
@@ -18,13 +18,13 @@
                   <a href="" ng-click="get(content._id)">
                     <i class="icon-list-alt"></i> {{content.filename}}                                      
                     <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span>
-                  </a> 
+                  </a>           
                 </li>                
               </ul>
               
               <li class="divider"></li>
               <li class="nav-header" onclick="$('#toggle_content').collapse('toggle')">
-                Content : {{total_json}} <i class="icon-chevron-down pull-right"></i>                 
+                Content <i class="icon-chevron-down pull-right"></i>                 
               </li>
               
               <ul class="unstyled collapse nav nav-list" id="toggle_content">            
@@ -37,7 +37,7 @@
               </ul>
               <li class="divider"></li>
               <li class="nav-header" onclick="$('#toggle_xml').collapse('toggle')">
-                XML : {{total_xml}} <i class="icon-chevron-down pull-right"></i>                 
+                XML <i class="icon-chevron-down pull-right"></i>                 
               </li>              
               <ul class="unstyled collapse nav nav-list" id="toggle_xml">            
                 <li ng-repeat="content in content_list | filter:{type:'xml'}">
@@ -47,13 +47,14 @@
                 </li>                
               </ul>
               <li class="divider"></li>
-              <li class="nav-header" onclick="$('#toggle_unknown').collapse('toggle')">
-                Unknown Type : {{total_unknown}} <i class="icon-chevron-down pull-right"></i>                 
+              <li class="nav-header" onclick="$('#toggle_unknow').collapse('toggle')">
+                Unknow Type<i class="icon-chevron-down pull-right"></i>                 
               </li>
-              <ul class="unstyled collapse nav nav-list" id="toggle_unknown">
-                <li ng-repeat="content in content_list">
+              <ul class="unstyled collapse nav nav-list" id="toggle_unknow">
+                <li ng-repeat="content in content_list | filter:{type:'unknow'}">
                   <a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}} 
-                  <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span></a>                      
+                  <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span></a>
+                      
                 </li>
               </ul>
               
@@ -76,6 +77,24 @@
 
       <div class="tab-content">
         <div class="tab-pane active" id="home">
+          <div class="btn-group pull-right">
+            <button class="btn" ng-click="save()" ng-show="document">
+              <i class="icon-ok icon-black"></i> Save
+            </button>
+            <button class="btn" ng-click="create()" ng-show="user.user">
+              <i class="icon-plus icon-black"></i> New
+            </button>
+            <button class="btn" ng-click="convert_to_json()" ng-show="document.metadata.type=='xml' && user.user">
+              <i class="icon-plus icon-black"></i> toJSON
+            </button>
+            <button class="btn" ng-click="del()" ng-show="user.user && document">
+              <i class="icon-remove icon-black" ></i>
+                Del
+            </button>
+          </div>
+      <!--
+      <div class="tab-content">
+        <div class="tab-pane active" id="home">
           <div class="pull-right">
             <button ng-click="save()" class="btn btn-primary btn-small" ng-show="document"> 
               <i class="icon-ok icon-white"></i> Save
@@ -91,6 +110,7 @@
                 Del
             </button>
           </div>
+          -->
           
           <div ng-model="ace_content" codemirror="text">
           <strong>Editor Panel :</strong>{{document.filename}} <br>

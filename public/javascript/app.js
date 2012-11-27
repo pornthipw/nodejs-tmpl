@@ -72,12 +72,9 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
         if(v.metadata) {
             v.type = v.metadata.type;
             v.user = v.metadata.user;
-            if($scope.user.user.identifier == v.metadata.user.identifier) { 
-                           
-              //console.log(v);
-              
-              if (v.type == 'haml') 
-              { 
+            if($scope.user.user.identifier == v.metadata.user.identifier) {                            
+              //console.log(v);              
+              if (v.type == 'haml') { 
                 $scope.total_haml ++; 
               } else {
                 if (v.type == 'json') {
@@ -93,11 +90,13 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
                   }
                 }
               }
+              console.log($scope.total_unknown);
               result.push(v);
             }
-        }
-        $scope.content_list = result;
+        }      
       });
+      $scope.content_list = result;
+      console.log(result);
     });
   };
   
