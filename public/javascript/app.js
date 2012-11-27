@@ -188,7 +188,8 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
     */
     $scope.document.update(function(response) {
       $scope.document._id = self.current_id;
-      if(response.success) {        
+      if(response.success) {   
+        self.message(response.message);  
         self.update_file_list();
       } else {                
         self.message(response.message);
@@ -203,6 +204,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       FileDB.save({id:self.current_id, 
         content:self.base64.encode($scope.ace_content)}, function(response) {	
           if(response.success) {
+            self.message(response.message);
             self.update_file_list();
           } else {
             self.message(response.message);

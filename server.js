@@ -158,7 +158,7 @@ app.post('/:db/files/:id', function (req,res) {
                   if(!err) {
                     gridStore.close(function(err, result) {                        
                       if(!err) {
-                        res.json(result);
+                        res.json({"success":true, "message":"You are ready to update this file.", "result":result});
                         db.close();
                       }
                     });
@@ -196,7 +196,7 @@ app.put('/:db/files/:id', function (req,res) {
             function(err, doc) {  
               db.close(); 
               if(!err) {
-                res.json({success:true});
+                res.json({success:true,"message":"You are ready to update this metatdata."});
               } else {
                 res.json({success:false,message:err});
               } 
