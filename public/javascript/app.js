@@ -26,7 +26,6 @@ app.config(function($routeProvider) {
 
 function UserCtrl($scope, User, Logout) {
   $scope.user = User.get(function(response) {
-    //console.log(response);
   });
   
   $scope.logout = function(){
@@ -90,13 +89,12 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
                   }
                 }
               }
-              console.log($scope.total_unknown);
               result.push(v);
             }
         }      
       });
       $scope.content_list = result;
-      console.log(result);
+      //console.log(result);
     });
   };
   
@@ -132,8 +130,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   //  lineNumbers: true                
   //});
   
-  //$scope.template_list = FileDB.query 
-    
   $scope.get = function(contentId) {
     self.current_id = contentId;
     FileDB.get({id:contentId, fields:JSON.stringify(["document"])}, function(response) {
@@ -148,19 +144,16 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
             $scope.template_content = self.base64.decode(response.content);
             $scope.ace_content = $scope.template_content;    
             $scope.base_64_content = response.content;        
-            //self.current_ace = $scope.ace_content;
           } else {	    
             if(meta.type == "json") {
               $scope.content = self.base64.decode(response.content);
               $scope.ace_content = $scope.content;
               $scope.base_64_content = response.content;
-              //self.current_ace = $scope.ace_content;
             } else {	    
                 if(meta.type == "xml") {
                   $scope.xml_content = self.base64.decode(response.content);
                   $scope.ace_content = $scope.xml_content;
-                  $scope.base_64_content = response.content;
-                  //self.current_ace = $scope.ace_content;                        	    
+                  $scope.base_64_content = response.content;                      	    
                 } else {                                    
                   $scope.ace_content = self.base64.decode(response.content); 
                   $scope.base_64_content = response.content;         
@@ -168,7 +161,8 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
               }
             } 
           } else {            
-              $scope.ace_content = self.base64.decode(response.content);          
+              $scope.ace_content = self.base64.decode(response.content);    
+              $scope.base_64_content = response.content;       
           }
         }
     }); 
@@ -196,7 +190,6 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       $scope.document._id = self.current_id;
       if(response.success) {        
         self.update_file_list();
-         $('#myModal').modal('hide')
       } else {                
         self.message(response.message);
       }
@@ -363,7 +356,8 @@ function publicCtrl($scope, $location,$routeParams, FileDB,Logout) {
               }
             } 
           } else {            
-              $scope.ace_content = self.base64.decode(response.content);          
+              $scope.ace_content = self.base64.decode(response.content);     
+              $scope.base_64_content = response.content;      
           }
         }
     }); 

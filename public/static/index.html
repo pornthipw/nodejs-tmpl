@@ -51,7 +51,7 @@
                 Unknown Type : {{total_unknown}} <i class="icon-chevron-down pull-right"></i>                 
               </li>
               <ul class="unstyled collapse nav nav-list" id="toggle_unknown">
-                <li ng-repeat="content in content_list">
+                <li ng-repeat="content in content_list| filter:{type:'unknown'}">
                   <a href="" ng-click="get(content._id)"><i class="icon-list-alt"></i> {{content.filename}} 
                   <span class="pull-right label label-warning" ng-show="content.metadata.public == true">P</span></a>                      
                 </li>

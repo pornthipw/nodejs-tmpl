@@ -40,7 +40,6 @@ passport.use(new OpenIDStrategy({
     profile: true
   },
   function(identifier, profile, done) {
-    console.log(profile);
     process.nextTick(function () {
       return done(null, { identifier: identifier, profile:profile })
     });
@@ -148,7 +147,7 @@ app.post('/:db/files/:id', function (req,res) {
   var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);   
   db.collection('fs.files', function(err, collection) {
     collection.findOne({_id:fileId}, function(err, doc) {
-      console.log(fileId);
+      //console.log(fileId);
       if (req.user) {
         if(doc.metadata.user.identifier && (doc.metadata.user.identifier == req.user.identifier)) {
           mongodb.GridStore.exist(db, fileId, function(err, exist) {
@@ -175,9 +174,9 @@ app.post('/:db/files/:id', function (req,res) {
             } 
           });
         } else {
-              res.json({"success":false, "message":"Not Allow!"});
-	}
-       } else {
+          res.json({"success":false, "message":"Not Allow!"});
+	      }
+      } else {
         res.json({"success":false, "message":"You are not allow to update this file."});
         db.close();
       } 
@@ -218,7 +217,7 @@ app.put('/:db/files/:id', function (req,res) {
 
 //update Metadata
 app.post('/:db/metadata/:id', function (req,res) {
-  console.log("update Metadata");
+  //console.log("update Metadata");
   var db = req.db;
   
   var fileId = db.bson_serializer.ObjectID.createFromHexString(req.params.id);
@@ -256,9 +255,6 @@ app.post('/:db/metadata/:id', function (req,res) {
 //create File
 app.post('/:db/files', function (req,res){
   var db = req.db;
-  console.log(req.body.content);
-  console.log(req.body.filename);
-  console.log(req.body.meta_type);
   if(req.body) {          
     var gridStore = new mongodb.GridStore(db, new mongodb.ObjectID(),req.body.filename, 'w',{metadata: {'type':req.body.meta_type,'user':req.user}});   
     gridStore.open(function(err, gridStore) {
@@ -270,7 +266,7 @@ app.post('/:db/files', function (req,res){
           if(err) {            
             res.send(JSON.stringify({success:false,message:err}));              
           }
-          console.log(JSON.stringify(result));
+          //console.log(JSON.stringify(result));
           res.send(JSON.stringify({success:true, response:result})); 	  
           db.close();
         });
@@ -329,7 +325,7 @@ app.get('/:db/files/:id', function (req,res, next){
 
 //delete File 
 app.delete('/:db/files/:id',function(req,res){  
-  console.log('deleteFile '+req.params.id);
+  //console.log('deleteFile '+req.params.id);
   var db = req.db;
   if (req.params.id.length == 24) {
     try {
@@ -430,7 +426,7 @@ app.post('/ajax/xml2json', function(req, res) {
         console.log(err);                               
         res.json({status:'error while parsing xml',success:false,message:err});
       }  
-      console.log("result->"+result);
+      //console.log("result->"+result);
       //res.json({success:true,message:"OK"});
       res.json(result);
             
