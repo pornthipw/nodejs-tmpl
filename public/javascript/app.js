@@ -94,9 +94,11 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
         }      
       });
       $scope.content_list = result;
+      
       //console.log(result);
     });
   };
+  
   
   
   $scope.user = User.get(function(response) {
@@ -133,6 +135,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
   $scope.get = function(contentId) {
     self.current_id = contentId;
     FileDB.get({id:contentId, fields:JSON.stringify(["document"])}, function(response) {
+      
       if(response.success) {
         self.current_document = response.document;
         
@@ -163,9 +166,14 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
           } else {            
               $scope.ace_content = self.base64.decode(response.content);    
               $scope.base_64_content = response.content;       
-          }
+          }  
         }
+        //BUG
+        //$scope.document = FileDB.query();
+        console.log($scope.base_64_content);
+         
     }); 
+    
   };
   
   
@@ -196,6 +204,7 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
       }
       self.update_file_list();
       
+      
     });
   };
     
@@ -214,9 +223,15 @@ function fileCtrl($scope, $location,$routeParams, User, FileDB, MetaDB,Convert ,
         $scope.content = $scope.ace_content;
       } else {
         if(self.current_type == 'haml') {
-          $scope.template_content = $scope.ace_content;
+          $scope.template_content = $scope.ace_content;   
+        } else {
+            if (self.current_type == null) {
+               $scope.base_64_content = self.base64.encode($scope.ace_content);
+            }
         }
       }
+      $scope.base_64_content = self.base64.encode($scope.ace_content);
+      //console.log($scope.base_64_content);
       self.run();
 
     } 
